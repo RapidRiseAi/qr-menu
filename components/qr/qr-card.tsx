@@ -3,6 +3,7 @@
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { isLocalhostUrl } from "@/lib/qr/url";
 export function QrCard({
   url,
   title,
@@ -22,6 +23,8 @@ export function QrCard({
       color: { dark: "#0D0D0F", light: "#FFFFFF" },
     }).then(setSrc);
   }, [url]);
+  const usesLocalhost = isLocalhostUrl(url);
+
   function download() {
     const a = document.createElement("a");
     a.href = src;
@@ -43,6 +46,12 @@ export function QrCard({
       )}
       <p className="text-sm font-semibold">Scan to view menu and order</p>
       <p className="mt-2 break-all text-xs text-slate-400">{url}</p>
+      {usesLocalhost && (
+        <p className="mt-3 rounded-2xl bg-red-50 px-3 py-2 text-xs font-bold text-red-700">
+          This QR points to localhost, which only works on this computer. Set
+          NEXT_PUBLIC_APP_URL to your public or LAN URL before printing.
+        </p>
+      )}
       {!print && (
         <div className="no-print mt-4 flex gap-2">
           <Button type="button" onClick={download} className="flex-1">
