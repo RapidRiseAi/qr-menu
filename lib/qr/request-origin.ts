@@ -1,29 +1,14 @@
 import { headers } from "next/headers";
-import { isLocalhostUrl } from "@/lib/qr/url";
-
-export async function getRequestOrigin() {
+export async function requestOrigin() {
+  const configuredOrigin = process.env.NEXT_PUBLIC_SITE_URL;
+  if (configuredOrigin) return configuredOrigin.replace(/\/$/, "");
   const headerStore = await headers();
-  const forwardedHost = headerStore.get("x-forwarded-host");
-  const host = forwardedHost || headerStore.get("host");
-  const requestOrigin = host
-    ? getOriginFromHost(host, headerStore.get("x-forwarded-proto"))
-    : undefined;
-  const configuredOrigin = process.env.NEXT_PUBLIC_APP_URL;
-
-  if (
-    configuredOrigin &&
-    (!isLocalhostUrl(configuredOrigin) ||
-      !requestOrigin ||
-      isLocalhostUrl(requestOrigin))
-  ) {
-    return configuredOrigin;
-  }
-
-  return requestOrigin || configuredOrigin;
-}
-
-function getOriginFromHost(host: string, forwardedProto: string | null) {
+  const host =
+    headerStore.get("x-forwarded-host") ||
+    headerStore.get("host") ||
+    "localhost:3000";
   const proto =
-    forwardedProto || (host.startsWith("localhost") ? "http" : "https");
+    headerStore.get("x-forwarded-proto") ||
+    (host.includes("localhost") ? "http" : "https");
   return `${proto}://${host}`;
 }
