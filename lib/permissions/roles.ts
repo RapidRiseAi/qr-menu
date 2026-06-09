@@ -1,10 +1,10 @@
-export type BranchRole = "super_admin" | "branch_admin" | "staff" | "kitchen";
-export function canManageMenu(role: string) {
-  return ["super_admin", "branch_admin"].includes(role);
+export type UserRole = "super_admin" | "branch_admin";
+export function canManageGlobalMenu(role?: string | null) {
+  return role === "super_admin";
 }
-export function canManageTables(role: string) {
-  return ["super_admin", "branch_admin"].includes(role);
+export function canManageBranch(role?: string | null) {
+  return role === "super_admin" || role === "branch_admin";
 }
-export function canManageOrders(role: string) {
-  return ["super_admin", "branch_admin", "staff", "kitchen"].includes(role);
+export function isValidRole(role?: string | null): role is UserRole {
+  return role === "super_admin" || role === "branch_admin";
 }

@@ -1,9 +1,8 @@
-export function menuUrl(token: string, origin?: string) {
+export function branchMenuUrl(branchSlug: string, origin?: string) {
   const base =
-    origin || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  return `${base.replace(/\/$/, "")}/menu/${token}`;
+    origin || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  return `${base.replace(/\/$/, "")}/m/${branchSlug}`;
 }
-
 export function isLocalhostUrl(url: string) {
   try {
     const { hostname } = new URL(url);

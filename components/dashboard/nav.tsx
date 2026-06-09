@@ -1,48 +1,31 @@
 import Link from "next/link";
-import { UtensilsCrossed } from "lucide-react";
-export function DashboardShell({
-  children,
-  branchName,
-}: {
-  children: React.ReactNode;
-  branchName: string;
-}) {
-  const links = [
-    ["/dashboard", "Home"],
-    ["/dashboard/menu", "Menu"],
-    ["/dashboard/tables", "Tables"],
-    ["/dashboard/orders", "Orders"],
-    ["/dashboard/kitchen", "Kitchen"],
-    ["/dashboard/qr-codes", "QR"],
-  ];
+import { APP_NAME } from "@/lib/constants";
+import { withBranch } from "@/lib/menu/branch-context";
+const links = [
+  ["Dashboard", "/dashboard"],
+  ["Menu", "/dashboard/menu"],
+  ["Categories", "/dashboard/categories"],
+  ["Specials", "/dashboard/specials"],
+  ["Media", "/dashboard/media"],
+  ["QR", "/dashboard/qr"],
+];
+export function DashboardNav({ branchSlug }: { branchSlug?: string }) {
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#2b2416,#0d0d0f_45%)]">
-      <nav className="sticky top-0 z-30 border-b border-white/10 bg-black/60 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
-          <div className="rounded-2xl bg-gold p-2 text-black">
-            <UtensilsCrossed size={20} />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold">{branchName}</p>
-            <p className="text-xs text-white/50">Branch OS</p>
-          </div>
-          <form action="/api/auth/logout" method="post">
-            <button className="text-xs text-white/60">Logout</button>
-          </form>
-        </div>
-        <div className="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-4 pb-3 no-scrollbar">
-          {links.map(([href, label]) => (
-            <Link
-              key={href}
-              href={href}
-              className="whitespace-nowrap rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white/80"
-            >
-              {label}
-            </Link>
-          ))}
-        </div>
+    <aside className="rounded-[2rem] border border-white/10 bg-hennies-blue p-4 lg:sticky lg:top-4 lg:h-fit">
+      <p className="mb-4 text-xs font-black uppercase tracking-[0.25em] text-hennies-aqua">
+        {APP_NAME}
+      </p>
+      <nav className="grid gap-2 sm:grid-cols-3 lg:grid-cols-1">
+        {links.map(([label, href]) => (
+          <Link
+            key={href}
+            href={branchSlug ? withBranch(href, branchSlug) : href}
+            className="rounded-2xl px-4 py-3 text-sm font-bold text-white/80 hover:bg-white/10 hover:text-white"
+          >
+            {label}
+          </Link>
+        ))}
       </nav>
-      <section className="mx-auto max-w-7xl px-4 py-6">{children}</section>
-    </main>
+    </aside>
   );
 }

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 export const metadata: Metadata = {
-  title: "Branch QR Menu Ordering System",
-  description: "Mobile-first QR menu and table ordering MVP",
+  title: "Hennies Digital Menu OS",
+  description:
+    "Branch-specific visual digital menu system powered by Supabase and QR codes.",
 };
 export default function RootLayout({
   children,

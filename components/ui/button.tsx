@@ -1,35 +1,43 @@
 import Link from "next/link";
+import type {
+  AnchorHTMLAttributes,
+  ButtonHTMLAttributes,
+  ReactNode,
+} from "react";
 import { cn } from "@/lib/utils/style";
-type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary" | "ghost" | "danger";
-};
-export function Button({ className, variant = "primary", ...props }: Props) {
-  return <button className={cn(buttonClass(variant), className)} {...props} />;
-}
-export function LinkButton({
+
+type Props = {
+  children: ReactNode;
+  variant?: "primary" | "ghost" | "light";
+  href?: string;
+  className?: string;
+} & ButtonHTMLAttributes<HTMLButtonElement> &
+  AnchorHTMLAttributes<HTMLAnchorElement>;
+export function Button({
+  children,
+  variant = "primary",
   href,
   className,
-  variant = "primary",
-  children,
-}: {
-  href: string;
-  className?: string;
-  variant?: Props["variant"];
-  children: React.ReactNode;
-}) {
-  return (
-    <Link href={href} className={cn(buttonClass(variant), className)}>
-      {children}
-    </Link>
+  ...props
+}: Props) {
+  const classes = cn(
+    "inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black transition",
+    variant === "primary" &&
+      "bg-hennies-orange text-white shadow-orange hover:-translate-y-0.5",
+    variant === "ghost" &&
+      "border border-white/15 bg-white/10 text-white hover:bg-white/15",
+    variant === "light" && "bg-white text-hennies-navy hover:bg-hennies-cream",
+    className,
   );
-}
-function buttonClass(v?: Props["variant"]) {
-  return cn(
-    "inline-flex items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold transition disabled:opacity-50",
-    v === "primary" && "bg-gold text-black shadow-glow",
-    v === "secondary" && "bg-white text-black",
-    v === "ghost" &&
-      "border border-white/15 bg-white/5 text-white hover:bg-white/10",
-    v === "danger" && "bg-red-500 text-white",
+  if (href)
+    return (
+      <Link href={href} className={classes}>
+        {children}
+      </Link>
+    );
+  return (
+    <button className={classes} {...props}>
+      {children}
+    </button>
   );
 }

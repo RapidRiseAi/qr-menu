@@ -1,64 +1,69 @@
-import { requireBranchUser } from "@/lib/auth/branch";
-import { DashboardShell } from "@/components/dashboard/nav";
+import { BranchQr } from "@/components/qr/branch-qr";
+import { BranchSwitcher } from "@/components/dashboard/branch-switcher";
+import { DashboardShell } from "@/components/dashboard/shell";
 import { Card } from "@/components/ui/card";
-import { LinkButton } from "@/components/ui/button";
-import { OPEN_ORDER_STATUSES } from "@/lib/constants";
-export default async function Dashboard() {
-  const { supabase, branch } = await requireBranchUser();
-  const today = new Date().toISOString().slice(0, 10);
-  const [
-    { count: todays },
-    { count: active },
-    { count: items },
-    { count: tables },
-  ] = await Promise.all([
-    supabase
-      .from("orders")
-      .select("id", { count: "exact", head: true })
-      .eq("branch_id", branch.id)
-      .gte("created_at", today),
-    supabase
-      .from("orders")
-      .select("id", { count: "exact", head: true })
-      .eq("branch_id", branch.id)
-      .in("status", OPEN_ORDER_STATUSES as unknown as string[]),
-    supabase
-      .from("menu_items")
-      .select("id", { count: "exact", head: true })
-      .eq("branch_id", branch.id),
-    supabase
-      .from("restaurant_tables")
-      .select("id", { count: "exact", head: true })
-      .eq("branch_id", branch.id)
-      .eq("is_active", true),
-  ]);
+import { Button } from "@/components/ui/button";
+import { branchFromSearchParams, withBranch } from "@/lib/menu/branch-context";
+import { menuItems, specials } from "@/lib/menu/demo-data";
+
+type Props = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+export default async function DashboardPage({ searchParams }: Props) {
+  const branch = await branchFromSearchParams(searchParams);
+  const branchSpecials = specials.filter(
+    (special) => special.is_global || !special.is_global,
+  );
+  const soldOut =
+    branch.slug === "hennies-boksburg"
+      ? 4
+      : branch.slug === "hennies-randburg"
+        ? 2
+        : 3;
   return (
-    <DashboardShell branchName={branch.name}>
-      <h1 className="text-3xl font-black">Today’s operations</h1>
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <DashboardShell
+      title="Branch dashboard"
+      subtitle="Manage the visual menu, branch-specific overrides, specials, media and the single QR code for this branch."
+      branch={branch}
+    >
+      <BranchSwitcher branch={branch} basePath="/dashboard" />
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {[
-          ["Today’s orders", todays],
-          ["Open orders", active],
-          ["Menu items", items],
-          ["Active tables", tables],
-        ].map(([label, value]) => (
-          <Card key={label as string}>
-            <p className="text-sm text-white/50">{label}</p>
-            <p className="mt-3 text-4xl font-black">{value ?? 0}</p>
+          ["Public menu", `/m/${branch.slug}`],
+          ["Total items", menuItems.length],
+          ["Sold out", soldOut],
+          ["Active specials", branchSpecials.length],
+        ].map(([k, v]) => (
+          <Card key={String(k)} className="bg-white/8">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-hennies-sky">
+              {k}
+            </p>
+            <p className="mt-3 break-words text-3xl font-black">{v}</p>
           </Card>
         ))}
       </div>
-      <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <LinkButton href="/dashboard/menu">Manage Menu</LinkButton>
-        <LinkButton href="/dashboard/tables" variant="secondary">
-          Manage Tables
-        </LinkButton>
-        <LinkButton href="/dashboard/orders" variant="ghost">
-          View Orders
-        </LinkButton>
-        <LinkButton href="/dashboard/qr-codes" variant="ghost">
-          QR Codes
-        </LinkButton>
+      <div className="mt-5 grid gap-3 md:grid-cols-4">
+        <Button href={withBranch("/dashboard/menu", branch.slug)}>
+          Edit Menu
+        </Button>
+        <Button
+          href={withBranch("/dashboard/specials", branch.slug)}
+          variant="ghost"
+        >
+          Manage Specials
+        </Button>
+        <Button
+          href={withBranch("/dashboard/media", branch.slug)}
+          variant="ghost"
+        >
+          Upload Media
+        </Button>
+        <Button href={withBranch("/dashboard/qr", branch.slug)} variant="light">
+          Download QR
+        </Button>
+      </div>
+      <div className="mt-6 rounded-[2rem] border border-white/10 bg-white/6 p-4 xl:p-6">
+        <BranchQr branchName={branch.name} slug={branch.slug} />
       </div>
     </DashboardShell>
   );
