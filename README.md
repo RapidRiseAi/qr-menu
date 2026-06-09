@@ -21,37 +21,22 @@ cp .env.example .env.local
 
 Required variables:
 
-- `SUPABASE_URL` (provided by the Vercel/Supabase integration)
+- `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` (used by public order placement after server-side validation)
 - `NEXT_PUBLIC_APP_URL` (used to generate QR links)
-- `NEXT_PUBLIC_SUPABASE_URL` is optional for the current server-action login flow, but recommended if you add browser-side Supabase clients later.
 
 ## Supabase setup
 
 1. Create a Supabase project.
-2. Because this repo is connected through Supabase GitHub Integration, the SQL files in `supabase/migrations/` will apply when the production branch is merged/deployed. For manual setup, run `supabase/schema.sql` and then `supabase/seed.sql` in SQL Editor.
+2. In SQL Editor, run `supabase/schema.sql`.
 3. Create a Supabase Auth user:
    - Email: `admin@demo-branch.test`
    - Password: `DemoBranch123!`
 4. Copy the new Auth user UUID.
-5. Link the Auth user to the seeded branch by running:
-
-   ```sql
-   select public.link_demo_branch_admin('<AUTH_USER_UUID>'::uuid);
-   ```
-
-6. Confirm the public `menu-media` storage bucket exists.
-
-## Supabase migrations
-
-The project now includes `supabase/config.toml` for Supabase CLI defaults and migration files under `supabase/migrations/`:
-
-- `config.toml` defines local Supabase CLI ports, schemas, storage, and auth redirect defaults without storing secrets.
-- `20260609000100_initial_schema.sql` creates tables, indexes, triggers, RLS policies, and the `menu-media` storage bucket.
-- `20260609000200_demo_seed.sql` seeds the Demo Restaurant Group, Mbombela Branch, tables, categories, menu items, and the `link_demo_branch_admin` helper.
-
-These migrations are designed for the Supabase GitHub Integration working directory shown in the dashboard (`.` containing the `supabase/` folder).
+5. Run `supabase/seed.sql`.
+6. At the bottom of `supabase/seed.sql`, replace `DEMO_USER_UUID` in the commented profile/branch membership statements with the Auth UUID and run those two statements.
+7. Confirm the public `menu-media` storage bucket exists.
 
 ## Local development
 

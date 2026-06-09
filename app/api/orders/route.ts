@@ -79,10 +79,12 @@ export async function POST(request: Request) {
   await supabase
     .from("order_items")
     .insert(orderLines.map((i) => ({ ...i, order_id: order.id })));
-  await supabase.from("order_status_history").insert({
-    order_id: order.id,
-    status: "New",
-    note: "Order placed by customer",
-  });
+  await supabase
+    .from("order_status_history")
+    .insert({
+      order_id: order.id,
+      status: "New",
+      note: "Order placed by customer",
+    });
   return NextResponse.json({ order });
 }
