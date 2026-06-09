@@ -21,7 +21,7 @@ cp .env.example .env.local
 
 Required variables:
 
-- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_URL` (required for browser-based Supabase auth; server code can also read `SUPABASE_URL`)
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` (used by public order placement after server-side validation)
 - `NEXT_PUBLIC_APP_URL` (used to generate QR links)
@@ -66,5 +66,5 @@ The MVP includes branch-scoped RLS policies and service-route validation for cus
 
 1. Push this repository to GitHub.
 2. Import it into Vercel.
-3. Add all `.env.example` variables in Vercel Project Settings.
+3. Add all `.env.example` variables in Vercel Project Settings. If your host already created `SUPABASE_URL`, also add the same value as `NEXT_PUBLIC_SUPABASE_URL` so browser auth can initialize correctly.
 4. Deploy.
