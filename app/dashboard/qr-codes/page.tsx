@@ -2,8 +2,10 @@ import { DashboardShell } from "@/components/dashboard/nav";
 import { requireBranchUser } from "@/lib/auth/branch";
 import { QrCard } from "@/components/qr/qr-card";
 import { menuUrl } from "@/lib/qr/url";
+import { getRequestOrigin } from "@/lib/qr/request-origin";
 export default async function QrCodesPage() {
   const { supabase, branch } = await requireBranchUser();
+  const origin = await getRequestOrigin();
   const { data: tablesData } = await supabase
     .from("restaurant_tables")
     .select("*")
@@ -26,7 +28,7 @@ export default async function QrCodesPage() {
           <QrCard
             key={t.id}
             print
-            url={menuUrl(t.qr_token)}
+            url={menuUrl(t.qr_token, origin)}
             title={branch.name}
             subtitle={`${t.table_number} ${t.table_name || ""}`}
           />

@@ -24,7 +24,7 @@ Required variables:
 - `NEXT_PUBLIC_SUPABASE_URL` (required for browser-based Supabase auth; server code can also read `SUPABASE_URL`)
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` (used by public order placement after server-side validation)
-- `NEXT_PUBLIC_APP_URL` (used to generate QR links)
+- `NEXT_PUBLIC_APP_URL` (used to generate QR links; use your deployed domain in production or your computer LAN IP such as `http://192.168.1.20:3000` for phone scanning during local development)
 
 ## Supabase setup
 
@@ -45,7 +45,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open `http://localhost:3000` on the development computer. To scan QR codes from a phone during local development, set `NEXT_PUBLIC_APP_URL` in `.env.local` to the computer LAN URL (for example `http://192.168.1.20:3000`) and restart `npm run dev`; `localhost` in a QR code means the phone itself, not your computer.
 
 ## Demo flow
 

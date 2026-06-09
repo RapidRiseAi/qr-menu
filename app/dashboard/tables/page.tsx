@@ -6,8 +6,10 @@ import { Field, inputClass } from "@/components/ui/form";
 import { QrCard } from "@/components/qr/qr-card";
 import { deleteTable, saveTable } from "../actions";
 import { menuUrl } from "@/lib/qr/url";
+import { getRequestOrigin } from "@/lib/qr/request-origin";
 export default async function TablesPage() {
   const { supabase, branch } = await requireBranchUser();
+  const origin = await getRequestOrigin();
   const { data: tablesData } = await supabase
     .from("restaurant_tables")
     .select("*")
@@ -67,7 +69,7 @@ export default async function TablesPage() {
                 </form>
               </Card>
               <QrCard
-                url={menuUrl(t.qr_token)}
+                url={menuUrl(t.qr_token, origin)}
                 title={`${t.table_number} ${t.table_name || ""}`}
                 subtitle={branch.name}
               />
