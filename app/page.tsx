@@ -1,57 +1,68 @@
-import { LinkButton } from "@/components/ui/button";
-import { APP_CONFIG } from "@/lib/constants";
-import { QrCode, TabletSmartphone, ChefHat } from "lucide-react";
-export default function Landing() {
+import { QrCode, ShieldCheck, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { APP_NAME, BRAND_PLACEHOLDER, POWERED_BY } from "@/lib/constants";
+export default function LandingPage() {
   return (
-    <main className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_right,#3b2d13,#0d0d0f_48%)]">
-      <section className="mx-auto grid min-h-screen max-w-6xl items-center gap-10 px-5 py-12 md:grid-cols-2">
-        <div>
-          <p className="mb-4 inline-flex rounded-full border border-gold/30 bg-gold/10 px-4 py-2 text-sm font-semibold text-gold">
-            Premium QR ordering for every branch
-          </p>
-          <h1 className="text-5xl font-black tracking-tight md:text-7xl">
-            Branch QR Menu Ordering System
-          </h1>
-          <p className="mt-6 max-w-xl text-lg leading-8 text-white/70">
-            A mobile-first restaurant OS for branch menus, table QR codes,
-            customer ordering, kitchen flow, and order tracking.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <LinkButton href="/login">Login</LinkButton>
-            <LinkButton
-              href={`/menu/${APP_CONFIG.demoQrToken}`}
-              variant="ghost"
-            >
-              Demo menu
-            </LinkButton>
+    <main className="min-h-screen bg-hennies-navy text-white">
+      <section className="mx-auto max-w-7xl px-4 py-6">
+        <nav className="flex items-center justify-between">
+          <div className="rounded-2xl border border-hennies-aqua/40 bg-white px-4 py-3 text-sm font-black text-hennies-navy">
+            {BRAND_PLACEHOLDER}
           </div>
-        </div>
-        <div className="rounded-[2.5rem] border border-white/10 bg-white/10 p-5 shadow-glow backdrop-blur">
-          <div className="rounded-[2rem] bg-white p-5 text-slate-950">
-            <div className="flex items-center justify-between">
-              <b>Mbombela Branch</b>
-              <span className="rounded-full bg-black px-3 py-1 text-xs text-white">
-                Table 1
-              </span>
+          <div className="flex gap-2">
+            <Button href="/login" variant="ghost">
+              Login
+            </Button>
+            <Button href="/m/hennies-nelspruit">View demo</Button>
+          </div>
+        </nav>
+        <div className="grid items-center gap-10 py-16 lg:grid-cols-2">
+          <div>
+            <p className="mb-4 inline-flex rounded-full bg-hennies-aqua/15 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-hennies-aqua">
+              {APP_NAME}
+            </p>
+            <h1 className="text-5xl font-black leading-none sm:text-7xl">
+              A cheeky, premium visual menu OS for sports-bar branches.
+            </h1>
+            <p className="mt-5 max-w-xl text-lg text-white/70">
+              Mobile-first digital menus for food, drinks, specials, media and
+              QR browsing. No ordering workflow, no cart, no table-specific QR
+              complexity.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button href="/dashboard">Branch dashboard</Button>
+              <Button href="/admin" variant="light">
+                Super admin
+              </Button>
             </div>
-            <div className="mt-5 grid gap-3">
+          </div>
+          <div className="rounded-[2rem] border border-white/10 bg-hennies-blue p-4 shadow-aqua">
+            <img
+              src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1200&q=80"
+              alt="Sports bar"
+              className="h-96 w-full rounded-[1.5rem] object-cover"
+            />
+            <div className="grid gap-3 p-4 sm:grid-cols-3">
               {[
-                [QrCode, "Auto QR tables"],
-                [TabletSmartphone, "Phone-first menu"],
-                [ChefHat, "Kitchen status board"],
-              ].map(([Icon, label]: any) => (
+                [QrCode, "One branch QR"],
+                [Sparkles, "Visual specials"],
+                [ShieldCheck, "Supabase ready"],
+              ].map(([Icon, label]) => (
                 <div
-                  key={label}
-                  className="flex items-center gap-3 rounded-2xl bg-slate-100 p-4"
+                  key={String(label)}
+                  className="rounded-2xl bg-white/10 p-4"
                 >
-                  <Icon className="text-gold" />
-                  <span className="font-bold">{label}</span>
+                  <Icon className="h-5 w-5 text-hennies-orange" />
+                  <p className="mt-2 text-sm font-black">{String(label)}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </section>
+      <footer className="py-6 text-center text-xs font-bold uppercase tracking-[0.2em] text-white/50">
+        {POWERED_BY}
+      </footer>
     </main>
   );
 }

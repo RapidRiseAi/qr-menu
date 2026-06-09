@@ -1,23 +1,14 @@
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-export async function requireBranchUser() {
+export async function getCurrentProfile() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-  const { data: membership, error } = await supabase
-    .from("branch_users")
-    .select("role, branch:branches(*, restaurant_group:restaurant_groups(*))")
-    .eq("user_id", user.id)
-    .eq("is_active", true)
+  if (!user) return null;
+  const { data } = await supabase
+    .from("profiles")
+    .select("*, branch:branches(*)")
+    .eq("auth_user_id", user.id)
     .single();
-  if (error || !membership)
-    redirect("/login?error=No%20active%20branch%20membership");
-  return {
-    supabase,
-    user,
-    role: membership.role as string,
-    branch: membership.branch as any,
-  };
+  return data;
 }

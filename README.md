@@ -1,70 +1,99 @@
-# Branch QR Menu Ordering System
+# Hennies Digital Menu OS
 
-Mobile-first QR digital menu and table-ordering MVP built with Next.js App Router, TypeScript, Tailwind CSS, Supabase Auth/Database/Storage, and QR code generation.
+A branded, mobile-first visual digital menu system for Hennie’s Sports Bar-style restaurant branches. The app is intentionally **menu browsing only**: no cart, checkout, customer ordering, kitchen dashboard, waiter order tracking, POS integration, table recognition, or one-QR-per-table workflow.
 
-## Features
+## What is included
 
-- Premium landing page, Supabase email/password login, branch-scoped dashboard.
-- Menu/category CRUD with availability, prices, descriptions, and image/video media upload to Supabase Storage.
-- Table CRUD with unique `/menu/[qr_token]` links, QR preview, PNG download, copy link, and print page.
-- Customer QR menu with branch/table detection, category navigation, media cards, cart drawer, item notes, optional customer details, and order confirmation.
-- Order dashboard, order details with status history, and tablet-friendly kitchen display.
-- POS integration placeholder in `lib/integrations/pos` for future Pilot POS work.
+- Next.js App Router, TypeScript and Tailwind CSS.
+- Supabase Auth, PostgreSQL schema, RLS policies and Storage-ready media upload API.
+- One public QR route per branch: `/m/[branch_slug]`.
+- Customer-facing menu with sticky header, branch info, search, horizontal category tabs, popular picks, specials, images, tags, allergens, item detail modal, back-to-top button and the required `Powered by Rapid Rise AI` footer.
+- Branch dashboard with menu editor, category editor, specials editor, media upload UI and downloadable/printable QR poster.
+- Super Admin dashboard with branch management, global menu management and media asset placeholders.
+- Seed data for `Hennie’s Digital Menu Demo`, Nelspruit, Boksburg and Randburg branches, 20 menu categories and 80+ Hennie’s-style demo menu items.
 
-## Environment
+## Legal / brand asset note
 
-Copy `.env.example` to `.env.local` and fill in values:
+No copyrighted Hennie’s logo or proprietary food photography is hardcoded. The UI uses a placeholder text logo (`Hennie’s Digital Menu`) and safe placeholder image URLs. Upload approved brand assets and official photography through the media/admin flows before production use.
 
-```bash
-cp .env.example .env.local
-```
+## Brand research notes
 
-Required variables:
+The public Hennie’s site presents a sportsbar/pub franchise tone with Afrikaans-flavoured section names such as `LIGTE HAPPE`, `BUFFALO WINGS`, `BLÊRRIE LEKKER BURGERS`, `GROOT HAPPE`, and `BRAKKE BREKKIES`. Its production CSS includes a deep navy (`#002f5f`), bright sky blue (`#52c6e2`), warm gold (`#f0ab00`), cream (`#f2e9df`), and WhatsApp green (`#25d366`). This project uses those as the Hennie’s-inspired palette while keeping the uploaded logo placeholder legally safe.
 
-- `NEXT_PUBLIC_SUPABASE_URL` (required for browser-based Supabase auth; server code can also read `SUPABASE_URL`)
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY` (used by public order placement after server-side validation)
-- `NEXT_PUBLIC_APP_URL` (used to generate QR links; use your deployed domain in production or your computer LAN IP such as `http://192.168.1.20:3000` for phone scanning during local development)
+## Routes
 
-## Supabase setup
+- `/` — landing page
+- `/login` — Supabase Auth login
+- `/admin` — Super Admin overview
+- `/admin/branches` — manage branches
+- `/admin/global-menu` — manage global menu
+- `/admin/media` — global media assets
+- `/dashboard` — Branch Admin dashboard
+- `/dashboard/menu` — branch menu editor
+- `/dashboard/categories` — category editor
+- `/dashboard/specials` — specials editor
+- `/dashboard/media` — media upload
+- `/dashboard/qr` — branch QR code and poster
+- `/m/hennies-nelspruit` — demo public menu
+- `/m/hennies-boksburg` — demo public menu
+- `/m/hennies-randburg` — demo public menu
 
-1. Create a Supabase project.
-2. In SQL Editor, run `supabase/schema.sql`.
-3. Create a Supabase Auth user:
-   - Email: `admin@demo-branch.test`
-   - Password: `DemoBranch123!`
-4. Copy the new Auth user UUID.
-5. Run `supabase/seed.sql`.
-6. At the bottom of `supabase/seed.sql`, replace `DEMO_USER_UUID` in the commented profile/branch membership statements with the Auth UUID and run those two statements.
-7. Confirm the public `menu-media` storage bucket exists.
+## Setup
 
-## Local development
+1. Install dependencies:
 
-```bash
-npm install
-npm run dev
-```
+   ```bash
+   npm install
+   ```
 
-Open `http://localhost:3000` on the development computer. To scan QR codes from a phone during local development, set `NEXT_PUBLIC_APP_URL` in `.env.local` to the computer LAN URL (for example `http://192.168.1.20:3000`) and restart `npm run dev`; `localhost` in a QR code means the phone itself, not your computer.
+2. Copy environment variables:
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+3. Add Supabase values to `.env.local`:
+
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+   NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET=menu-media
+   ```
+
+4. Apply the database schema in Supabase SQL editor or through the Supabase CLI:
+
+   ```bash
+   psql "$SUPABASE_DB_URL" -f supabase/schema.sql
+   psql "$SUPABASE_DB_URL" -f supabase/seed.sql
+   ```
+
+5. Create Supabase Auth users, then add matching `profiles` rows:
+   - `role = 'super_admin'` for Super Admins.
+   - `role = 'branch_admin'` plus `branch_id` for Branch Admins.
+
+6. Create a public Supabase Storage bucket named `menu-media` or set `NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET` to your bucket name.
+
+7. Run locally:
+
+   ```bash
+   npm run dev
+   ```
 
 ## Demo flow
 
-1. Login at `/login` with the demo branch admin account.
-2. Open `/dashboard/menu` to add/edit categories and menu items.
-3. Upload image/video media for a menu item.
-4. Open `/dashboard/tables` to add tables and download/copy a QR code.
-5. Visit `/menu/demo-table-1` or scan the QR code.
-6. Add items to cart and place an order.
-7. View the order in `/dashboard/orders` or `/dashboard/kitchen`.
-8. Change status from New → Preparing → Ready → Served.
+1. Open `/admin` to view the global menu and branches.
+2. Open `/dashboard` for branch stats, quick actions and QR preview.
+3. Open `/dashboard/menu` to preview item availability, sold-out toggles, media upload fields and branch price overrides.
+4. Open `/dashboard/specials` to preview specials management.
+5. Open `/dashboard/qr` to download a QR PNG, copy the public URL or print a QR poster.
+6. Open `/m/hennies-nelspruit` on mobile width and search for burgers, wings, drinks or pizzas.
+7. Tap an item card to view details, tags, allergens and pricing.
+8. Confirm the footer says `Powered by Rapid Rise AI`.
 
 ## Production notes
 
-The MVP includes branch-scoped RLS policies and service-route validation for customer order creation. Before production, tighten public menu/table reads through QR-token-scoped RPCs, add anti-abuse controls to public ordering, and audit storage policies for your threat model.
-
-## Deploying to Vercel
-
-1. Push this repository to GitHub.
-2. Import it into Vercel.
-3. Add all `.env.example` variables in Vercel Project Settings. If your host already created `SUPABASE_URL`, also add the same value as `NEXT_PUBLIC_SUPABASE_URL` so browser auth can initialize correctly.
-4. Deploy.
+- RLS policies are included in `supabase/schema.sql` for public active-menu reads, branch-scoped admin edits and Super Admin global management.
+- The current UI includes demo data fallbacks so franchise demos work before Supabase is connected.
+- The schema is designed so ordering, waiter requests, analytics or POS modules can be added later without polluting the browsing-only MVP.
