@@ -1,0 +1,19 @@
+-- Run schema.sql first. Create auth user admin@demo-branch.test / DemoBranch123! in Supabase Auth, then replace DEMO_USER_UUID below.
+with grp as (insert into restaurant_groups (id,name) values ('11111111-1111-1111-1111-111111111111','Demo Restaurant Group') on conflict do nothing returning id),
+br as (insert into branches (id,restaurant_group_id,name,code) values ('22222222-2222-2222-2222-222222222222','11111111-1111-1111-1111-111111111111','Mbombela Branch','MBO') on conflict (code) do update set name=excluded.name returning id)
+insert into restaurant_tables (branch_id,table_number,table_name,qr_token,is_active) values
+('22222222-2222-2222-2222-222222222222','Table 1','Main floor','demo-table-1',true),('22222222-2222-2222-2222-222222222222','Table 2','Main floor','demo-table-2',true),('22222222-2222-2222-2222-222222222222','Table 3','Main floor','demo-table-3',true),('22222222-2222-2222-2222-222222222222','Patio 1','Garden patio','demo-patio-1',true),('22222222-2222-2222-2222-222222222222','Patio 2','Garden patio','demo-patio-2',true) on conflict (qr_token) do nothing;
+insert into menu_categories (id,branch_id,name,display_order) values
+('33333333-3333-3333-3333-333333333331','22222222-2222-2222-2222-222222222222','Burgers',1),('33333333-3333-3333-3333-333333333332','22222222-2222-2222-2222-222222222222','Chicken',2),('33333333-3333-3333-3333-333333333333','22222222-2222-2222-2222-222222222222','Drinks',3),('33333333-3333-3333-3333-333333333334','22222222-2222-2222-2222-222222222222','Desserts',4) on conflict do nothing;
+insert into menu_items (branch_id,category_id,name,description,price,media_type,media_url,is_available,display_order) values
+('22222222-2222-2222-2222-222222222222','33333333-3333-3333-3333-333333333331','Gold Stack Burger','Double smashed beef, cheddar, pickles, house sauce.',145,'image','https://images.unsplash.com/photo-1568901346375-23c9450c58cd',true,1),
+('22222222-2222-2222-2222-222222222222','33333333-3333-3333-3333-333333333331','Mbombela Veggie Burger','Crispy chickpea patty, avo, tomato relish.',118,'image','https://images.unsplash.com/photo-1550547660-d9450f859349',true,2),
+('22222222-2222-2222-2222-222222222222','33333333-3333-3333-3333-333333333332','Peri-Peri Half Chicken','Flame grilled with lemon herb or hot peri-peri.',165,'image','https://images.unsplash.com/photo-1598515214211-89d3c73ae83b',true,1),
+('22222222-2222-2222-2222-222222222222','33333333-3333-3333-3333-333333333332','Crispy Chicken Strips','Golden strips with ranch and chips.',96,'image','https://images.unsplash.com/photo-1562967916-eb82221dfb92',true,2),
+('22222222-2222-2222-2222-222222222222','33333333-3333-3333-3333-333333333333','Craft Lemonade','Fresh lemon, mint and sparkling soda.',42,'image','https://images.unsplash.com/photo-1523677011781-c91d1bbe2f9e',true,1),
+('22222222-2222-2222-2222-222222222222','33333333-3333-3333-3333-333333333333','Iced Coffee','Cold brew over ice with vanilla cream.',48,'image','https://images.unsplash.com/photo-1461023058943-07fcbe16d735',true,2),
+('22222222-2222-2222-2222-222222222222','33333333-3333-3333-3333-333333333334','Chocolate Lava Cake','Warm chocolate fondant, vanilla ice cream.',74,'image','https://images.unsplash.com/photo-1606313564200-e75d5e30476c',true,1),
+('22222222-2222-2222-2222-222222222222','33333333-3333-3333-3333-333333333334','Malva Pudding','Classic warm malva with custard.',68,'image','https://images.unsplash.com/photo-1488477181946-6428a0291777',true,2);
+-- Replace DEMO_USER_UUID after creating the Supabase Auth user.
+-- insert into profiles (id, full_name, role) values ('DEMO_USER_UUID','Demo Branch Admin','branch_admin') on conflict (id) do update set full_name=excluded.full_name;
+-- insert into branch_users (branch_id,user_id,role,is_active) values ('22222222-2222-2222-2222-222222222222','DEMO_USER_UUID','branch_admin',true) on conflict do nothing;

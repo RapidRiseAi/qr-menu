@@ -1,0 +1,4 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root{color-scheme:dark} body{@apply bg-charcoal text-white antialiased} input,textarea,select{@apply text-slate-950} .no-scrollbar::-webkit-scrollbar{display:none} .print-only{display:none}@media print{.no-print{display:none!important}.print-only{display:block}.print-card{break-inside:avoid;box-shadow:none!important;border:1px solid #ddd!important;color:#111!important;background:white!important}body{background:white!important}}
