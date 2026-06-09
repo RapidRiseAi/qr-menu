@@ -158,7 +158,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
 
       <section
         ref={menuStartRef}
-        className="relative mx-auto max-w-6xl scroll-mt-36 px-4 pb-10 pt-4"
+        className="relative mx-auto max-w-7xl scroll-mt-36 px-4 pb-10 pt-4"
       >
         <div className="absolute inset-x-0 top-0 -z-0 h-72 bg-[radial-gradient(circle_at_top_left,rgba(82,198,226,.18),transparent_38%),radial-gradient(circle_at_top_right,rgba(240,171,0,.16),transparent_40%)]" />
 
@@ -232,7 +232,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
           tight={isCategoryView || Boolean(normalized)}
         >
           {isCategoryView && activeCategoryMeta && (
-            <div className="mb-4 flex items-center justify-between rounded-2xl border border-white/10 bg-white/8 px-4 py-3">
+            <div className="mb-5 flex items-center justify-between rounded-[1.35rem] border border-hennies-gold/25 bg-[linear-gradient(135deg,rgba(0,47,95,.92),rgba(35,32,33,.72))] px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,.08)]">
               <span className="text-xs font-black uppercase tracking-[0.22em] text-hennies-sky">
                 {filtered.length} items in this category
               </span>
@@ -249,22 +249,24 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
             <div
               key={category.slug}
               id={category.slug}
-              className="scroll-mt-36 py-3 first:pt-0"
+              className="scroll-mt-36 rounded-[1.75rem] py-4 first:pt-0"
             >
               {!isCategoryView && (
-                <div className="mb-3 flex items-end justify-between gap-3">
+                <div className="mb-4 flex items-end justify-between gap-3 rounded-[1.4rem] border border-white/10 bg-[linear-gradient(135deg,rgba(0,47,95,.58),rgba(7,17,29,.2))] p-4">
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.22em] text-hennies-sky">
                       {category.description}
                     </p>
-                    <h3 className="text-2xl font-black">{category.name}</h3>
+                    <h3 className="text-3xl font-black leading-none">
+                      {category.name}
+                    </h3>
                   </div>
-                  <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold">
+                  <span className="rounded-full bg-hennies-orange px-3 py-1 text-xs font-black text-white shadow-orange">
                     {groupItems.length}
                   </span>
                 </div>
               )}
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {groupItems.map((item) => (
                   <ItemCard
                     key={item.id}
@@ -297,11 +299,13 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
 function HeroCard() {
   return (
     <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-hennies-navy shadow-2xl">
-      <img
+      <HenniesImage
         src={HERO_IMAGE}
         alt="Sports bar food spread"
-        className="h-[21rem] w-full object-cover opacity-75 sm:h-80"
-        fetchPriority="high"
+        className="h-[21rem] w-full opacity-75 sm:h-80"
+        width={980}
+        quality={58}
+        priority
       />
       <div className="absolute inset-0 bg-gradient-to-t from-hennies-night via-hennies-night/45 to-transparent" />
       <div className="absolute bottom-0 p-5 sm:p-8">
@@ -380,11 +384,17 @@ function Section({
 }) {
   return (
     <section className={tight ? "mt-2" : "mt-8"}>
-      <div className="mb-4">
-        <h2 className="text-3xl font-black leading-tight sm:text-4xl">
-          {title}
-        </h2>
-        <p className="mt-1 text-sm font-semibold text-white/62">{subtitle}</p>
+      <div className="mb-4 overflow-hidden rounded-[1.35rem] border border-hennies-sky/15 bg-[linear-gradient(135deg,rgba(0,47,95,.78),rgba(35,32,33,.52))] shadow-[inset_0_1px_0_rgba(255,255,255,.08)]">
+        <div className="h-1.5 bg-[linear-gradient(90deg,#f47c20,#f0ab00,#52c6e2)]" />
+        <div className="p-4">
+          <p className="mb-1 text-[10px] font-black uppercase tracking-[0.24em] text-hennies-orange">
+            Hennie’s menu board
+          </p>
+          <h2 className="text-3xl font-black leading-tight text-hennies-cream sm:text-4xl">
+            {title}
+          </h2>
+          <p className="mt-1 text-sm font-semibold text-white/66">{subtitle}</p>
+        </div>
       </div>
       {children}
     </section>
@@ -394,12 +404,12 @@ function Section({
 function SpecialCard({ special }: { special: Special }) {
   return (
     <article className="overflow-hidden rounded-[1.5rem] border border-hennies-orange/30 bg-hennies-charcoal shadow-[0_12px_30px_rgba(0,0,0,.25)]">
-      <img
-        src={compactImageUrl(special.image_url, 620, 55)}
-        alt=""
-        className="h-36 w-full object-cover sm:h-44"
-        loading="lazy"
-        decoding="async"
+      <HenniesImage
+        src={special.image_url}
+        alt={special.title}
+        className="h-36 w-full sm:h-44"
+        width={620}
+        quality={55}
       />
       <div className="p-4">
         <p className="text-[11px] font-black uppercase tracking-[0.24em] text-hennies-orange">
@@ -428,21 +438,22 @@ function ItemCard({
   return (
     <button
       onClick={onClick}
-      className={`group grid overflow-hidden rounded-[1.45rem] border border-white/12 bg-hennies-cream text-left text-hennies-navy shadow-[0_14px_30px_rgba(0,0,0,.28)] transition hover:-translate-y-1 hover:shadow-aqua ${
+      className={`group grid overflow-hidden rounded-[1.35rem] border border-hennies-sky/20 bg-[linear-gradient(180deg,#f2e9df,#fff7ed)] text-left text-hennies-navy shadow-[0_16px_36px_rgba(0,0,0,.32)] ring-1 ring-white/10 transition hover:-translate-y-1 hover:border-hennies-orange/55 hover:shadow-orange ${
         compact
           ? "min-w-[78vw] snap-start sm:min-w-[320px]"
-          : "grid-cols-[128px_1fr] sm:grid-cols-1"
+          : "grid-cols-[132px_1fr] sm:grid-cols-1"
       }`}
     >
-      <div className={`relative ${compact ? "" : "min-h-full sm:min-h-0"}`}>
-        <img
-          src={compactImageUrl(item.image_url, compact ? 520 : 460, 54)}
+      <div
+        className={`relative bg-hennies-charcoal ${compact ? "" : "min-h-full sm:min-h-0"}`}
+      >
+        <HenniesImage
+          src={item.image_url}
           alt={item.name}
-          loading="lazy"
-          decoding="async"
-          className={`h-full w-full object-cover transition duration-500 group-hover:scale-105 ${
-            compact ? "h-44" : "min-h-[164px] sm:h-44"
-          }`}
+          width={compact ? 520 : 460}
+          quality={54}
+          className={compact ? "h-44" : "min-h-[164px] sm:h-44"}
+          imgClassName="transition duration-500 group-hover:scale-105"
         />
         <div className="absolute left-2 top-2 flex flex-wrap gap-1.5">
           {item.is_popular && <Badge text="Popular" />}
@@ -450,16 +461,16 @@ function ItemCard({
           {item.is_sold_out && <Badge text="Sold out" tone="dark" />}
         </div>
       </div>
-      <div className="flex min-h-full flex-col p-3.5 sm:p-4">
+      <div className="flex min-h-full flex-col border-l border-hennies-orange/10 p-3.5 sm:border-l-0 sm:border-t sm:p-4">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="min-w-0 text-lg font-black leading-[1.05] sm:text-xl">
+          <h3 className="min-w-0 text-lg font-black leading-[1.05] tracking-[-0.02em] sm:text-xl">
             {item.name}
           </h3>
           <p className="shrink-0 rounded-full bg-hennies-orange px-3 py-1.5 text-sm font-black text-white shadow-orange">
             R{item.base_price}
           </p>
         </div>
-        <p className="mt-2 line-clamp-3 text-sm font-medium leading-relaxed text-slate-700 sm:line-clamp-2">
+        <p className="mt-2 line-clamp-3 text-sm font-semibold leading-relaxed text-slate-700 sm:line-clamp-2">
           {item.description}
         </p>
         <div className="mt-auto flex flex-wrap gap-1.5 pt-3">
@@ -474,6 +485,64 @@ function ItemCard({
         </div>
       </div>
     </button>
+  );
+}
+
+function HenniesImage({
+  src,
+  alt,
+  className,
+  imgClassName,
+  width = 640,
+  quality = 58,
+  priority = false,
+}: {
+  src?: string | null;
+  alt: string;
+  className: string;
+  imgClassName?: string;
+  width?: number;
+  quality?: number;
+  priority?: boolean;
+}) {
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(!src);
+  const resolvedSrc = src ? compactImageUrl(src, width, quality) : "";
+
+  return (
+    <div
+      className={`relative overflow-hidden bg-hennies-charcoal ${className}`}
+    >
+      {(!loaded || failed) && <ImageSkeleton label={alt} />}
+      {!failed && resolvedSrc && (
+        <img
+          src={resolvedSrc}
+          alt={alt}
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          fetchPriority={priority ? "high" : "auto"}
+          onLoad={() => setLoaded(true)}
+          onError={() => setFailed(true)}
+          className={`absolute inset-0 h-full w-full object-cover ${loaded ? "opacity-100" : "opacity-0"} ${imgClassName || ""}`}
+        />
+      )}
+    </div>
+  );
+}
+
+function ImageSkeleton({ label }: { label: string }) {
+  return (
+    <div className="absolute inset-0 grid place-items-center bg-[radial-gradient(circle_at_top_left,rgba(82,198,226,.22),transparent_34%),linear-gradient(135deg,#002f5f,#232021_68%,#f47c20)]">
+      <div className="absolute inset-0 hennies-skeleton opacity-55" />
+      <div className="relative px-4 text-center">
+        <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-hennies-cream text-[10px] font-black text-hennies-navy shadow-aqua">
+          HDM
+        </div>
+        <p className="mt-2 line-clamp-2 text-[10px] font-black uppercase tracking-[0.18em] text-hennies-cream/85">
+          {label || "Menu image loading"}
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -504,11 +573,13 @@ function ItemModal({ item, onClose }: { item: MenuItem; onClose: () => void }) {
         className="mx-auto max-h-[92vh] max-w-lg overflow-auto rounded-[1.75rem] bg-hennies-cream text-hennies-navy shadow-2xl"
       >
         <div className="relative">
-          <img
-            src={compactImageUrl(item.image_url, 760, 60)}
+          <HenniesImage
+            src={item.image_url}
             alt={item.name}
-            className="h-72 w-full object-cover"
-            decoding="async"
+            className="h-72 w-full"
+            width={760}
+            quality={60}
+            priority
           />
           <button
             onClick={onClose}
