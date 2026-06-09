@@ -45,8 +45,9 @@ Required variables:
 
 ## Supabase migrations
 
-The project now includes migration files under `supabase/migrations/`:
+The project now includes `supabase/config.toml` for Supabase CLI defaults and migration files under `supabase/migrations/`:
 
+- `config.toml` defines local Supabase CLI ports, schemas, storage, and auth redirect defaults without storing secrets.
 - `20260609000100_initial_schema.sql` creates tables, indexes, triggers, RLS policies, and the `menu-media` storage bucket.
 - `20260609000200_demo_seed.sql` seeds the Demo Restaurant Group, Mbombela Branch, tables, categories, menu items, and the `link_demo_branch_admin` helper.
 
