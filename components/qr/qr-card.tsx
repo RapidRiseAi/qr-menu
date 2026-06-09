@@ -1,0 +1,63 @@
+/* eslint-disable @next/next/no-img-element */
+"use client";
+import QRCode from "qrcode";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+export function QrCard({
+  url,
+  title,
+  subtitle,
+  print = false,
+}: {
+  url: string;
+  title: string;
+  subtitle?: string;
+  print?: boolean;
+}) {
+  const [src, setSrc] = useState("");
+  useEffect(() => {
+    QRCode.toDataURL(url, {
+      width: 420,
+      margin: 2,
+      color: { dark: "#0D0D0F", light: "#FFFFFF" },
+    }).then(setSrc);
+  }, [url]);
+  function download() {
+    const a = document.createElement("a");
+    a.href = src;
+    a.download = `${title.replace(/\s+/g, "-")}-qr.png`;
+    a.click();
+  }
+  return (
+    <div className="print-card rounded-3xl bg-white p-5 text-center text-slate-950 shadow-xl">
+      <h3 className="font-black">{title}</h3>
+      {subtitle && <p className="text-sm text-slate-500">{subtitle}</p>}
+      {src ? (
+        <img
+          src={src}
+          alt={`${title} QR code`}
+          className="mx-auto my-4 h-52 w-52"
+        />
+      ) : (
+        <div className="mx-auto my-4 h-52 w-52 animate-pulse bg-slate-100" />
+      )}
+      <p className="text-sm font-semibold">Scan to view menu and order</p>
+      <p className="mt-2 break-all text-xs text-slate-400">{url}</p>
+      {!print && (
+        <div className="no-print mt-4 flex gap-2">
+          <Button type="button" onClick={download} className="flex-1">
+            Download PNG
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="flex-1 !text-slate-950 !border-slate-200"
+            onClick={() => navigator.clipboard.writeText(url)}
+          >
+            Copy link
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
