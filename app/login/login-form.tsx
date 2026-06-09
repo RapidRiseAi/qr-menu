@@ -1,11 +1,10 @@
 "use client";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Field, inputClass } from "@/components/ui/form";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-export function LoginForm() {
-  const [error, setError] = useState("");
+export function LoginForm({ initialError = "" }: { initialError?: string }) {
+  const [error, setError] = useState(initialError);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   async function submit(e: React.FormEvent<HTMLFormElement>) {
@@ -13,13 +12,17 @@ export function LoginForm() {
     setLoading(true);
     setError("");
     const form = new FormData(e.currentTarget);
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email: String(form.get("email")),
-      password: String(form.get("password")),
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: String(form.get("email")),
+        password: String(form.get("password")),
+      }),
     });
+    const result = (await response.json()) as { error?: string };
     setLoading(false);
-    if (error) return setError(error.message);
+    if (!response.ok) return setError(result.error || "Login failed");
     router.push("/dashboard");
     router.refresh();
   }
