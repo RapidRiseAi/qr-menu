@@ -48,7 +48,88 @@ const SEARCH_SYNONYMS: Record<string, string[]> = {
   bakkie: ["basket", "bowl", "loaded"],
   pizza: ["flatbread", "slice"],
   coffee: ["americano", "cappuccino", "latte", "espresso", "koffie"],
-  beer: ["bier", "lager", "draught", "dumpie"],
+  beer: ["bier", "lager", "draught", "dumpie", "alcohol", "alcoholic"],
+  alchohol: ["alcohol", "beer", "cider", "cocktail", "spirits", "liquor"],
+  alchoholic: ["alcoholic", "alcohol", "beer", "cider", "cocktail"],
+  alcohol: [
+    "beer",
+    "bier",
+    "cider",
+    "cocktail",
+    "spirits",
+    "liquor",
+    "booze",
+    "drink",
+    "bar",
+  ],
+  alcoholic: ["alcohol", "beer", "cider", "cocktail", "spirits", "liquor"],
+  mocktail: ["virgin", "non alcoholic", "non-alcoholic", "zero alcohol"],
+  "long island": ["hennies iced tea", "iced tea cocktail"],
+  "long island iced tea": ["hennies iced tea", "iced tea cocktail"],
+  pina: ["colada", "christa colada", "pina colada"],
+  "pina colada": ["christa colada", "colada"],
+  mule: ["ginger ninja", "moscow mule", "ginger beer cocktail"],
+  "moscow mule": ["ginger ninja", "ginger cocktail"],
+  "sex on the beach": ["inge on the beach", "beach cocktail"],
+  daiquiri: [
+    "frozen inge",
+    "shaken inge",
+    "strawberry daiquiri",
+    "frozen cocktail",
+  ],
+  "frozen daiquiri": ["frozen inge", "frozen cocktail"],
+  margarita: ["strawberry margarita", "tequila cocktail"],
+};
+
+const CATEGORY_SEARCH_LABELS: Record<string, string[]> = {
+  "hot-drinks": ["hot drinks", "coffee", "tea", "koffie", "warm drinks"],
+  "cold-drinks": [
+    "cold drinks",
+    "sodas",
+    "juice",
+    "cooldrink",
+    "soft drink",
+    "water",
+  ],
+  milkshakes: ["milkshakes", "shake", "dessert drink"],
+  "beers-and-ciders": [
+    "beer",
+    "bier",
+    "cider",
+    "alcohol",
+    "alcoholic",
+    "lager",
+    "bar",
+  ],
+  cocktails: [
+    "cocktail",
+    "alcohol",
+    "alcoholic",
+    "spirits",
+    "liquor",
+    "bar",
+    "mixed drink",
+  ],
+  "non-alcoholic": [
+    "non alcoholic",
+    "non-alcoholic",
+    "mocktail",
+    "virgin",
+    "zero alcohol",
+    "family drinks",
+  ],
+  pizzas: ["pizza", "flatbread"],
+  "burgers-and-horrogs": [
+    "burger",
+    "hot dog",
+    "hotdog",
+    "horrog",
+    "burgertjie",
+  ],
+  "wings-and-ribbetjies": ["wings", "ribs", "ribbetjies", "buffalo"],
+  "vleis-vreters": ["steak", "meat", "vleis", "beef", "grill"],
+  "kant-happies": ["sides", "side", "chips", "fries", "sauce", "extras"],
+  "loaded-meals": ["loaded", "nachos", "chips", "fries"],
 };
 
 function expandSearchTokens(search: string) {
@@ -64,9 +145,18 @@ function expandSearchTokens(search: string) {
   });
 
   Object.entries(SEARCH_SYNONYMS).forEach(([key, synonyms]) => {
-    if (synonyms.some((synonym) => normalizedSearch.includes(synonym))) {
+    if (
+      normalizedSearch.includes(normalizeSearchText(key)) ||
+      synonyms.some((synonym) =>
+        normalizedSearch.includes(normalizeSearchText(synonym)),
+      )
+    ) {
       expanded.add(key);
       tokenize(key).forEach((part) => expanded.add(part));
+      synonyms.forEach((synonym) => {
+        expanded.add(synonym);
+        tokenize(synonym).forEach((part) => expanded.add(part));
+      });
     }
   });
 
@@ -76,10 +166,44 @@ function expandSearchTokens(search: string) {
 function scoreMenuItem(item: MenuItem, search: string) {
   const query = normalizeSearchText(search);
   const tokens = expandSearchTokens(search);
+  const wantsAlcohol = tokens.some((token) =>
+    [
+      "alcohol",
+      "alchohol",
+      "alcoholic",
+      "alchoholic",
+      "booze",
+      "liquor",
+      "spirits",
+      "bar",
+    ].includes(token),
+  );
+  const wantsNonAlcohol = tokens.some((token) =>
+    [
+      "non",
+      "non alcoholic",
+      "non-alcoholic",
+      "zero",
+      "mocktail",
+      "virgin",
+    ].includes(token),
+  );
+  if (
+    wantsAlcohol &&
+    !wantsNonAlcohol &&
+    item.category_slug === "non-alcoholic"
+  )
+    return 0;
   const name = normalizeSearchText(item.name);
   const description = normalizeSearchText(item.description);
   const tags = normalizeSearchText(item.tags.join(" "));
   const allergens = normalizeSearchText(item.allergens.join(" "));
+  const categoryText = normalizeSearchText(
+    [
+      item.category_slug,
+      ...(CATEGORY_SEARCH_LABELS[item.category_slug] || []),
+    ].join(" "),
+  );
   const ingredients = getItemIngredients(item);
   const ingredientsText = normalizeSearchText(ingredients.join(" "));
   const primaryIngredients = ingredients.slice(0, 3).map(normalizeSearchText);
@@ -98,6 +222,7 @@ function scoreMenuItem(item: MenuItem, search: string) {
   if (description.includes(query)) score += 220;
   if (tags.includes(query)) score += 180;
   if (allergens.includes(query)) score += 120;
+  if (categoryText.includes(query)) score += 360;
 
   tokens.forEach((token) => {
     if (name.split(" ").includes(token)) score += 120;
@@ -113,6 +238,7 @@ function scoreMenuItem(item: MenuItem, search: string) {
     else if (ingredientsText.includes(token)) score += 58;
 
     if (description.includes(token)) score += 26;
+    if (categoryText.includes(token)) score += 34;
     if (tags.includes(token)) score += 18;
   });
 
@@ -150,11 +276,39 @@ function getItemIngredients(item: MenuItem) {
       ["coffee", "americano", "cappuccino", "latte", "mochaccino", "espresso"],
     ],
     ["milk", ["milkshake", "latte", "cappuccino", "milk", "cream"]],
-    ["beer", ["beer", "lager", "lite", "stella", "black label"]],
+    ["beer", ["beer", "lager", "lite", "stella", "black label", "castle"]],
     ["cider", ["cider", "savanna", "hunter"]],
     [
+      "alcohol",
+      [
+        "cocktail",
+        "mojito",
+        "daiquiri",
+        "margarita",
+        "bloody mary",
+        "sunset",
+        "inge on the beach",
+        "hennies iced tea",
+        "ginger ninja",
+        "christa colada",
+        "beer",
+        "lager",
+        "cider",
+      ],
+    ],
+    [
       "cocktail mix",
-      ["cocktail", "mojito", "daiquiri", "margarita", "bloody mary"],
+      [
+        "cocktail",
+        "mojito",
+        "daiquiri",
+        "margarita",
+        "bloody mary",
+        "long island",
+        "pina colada",
+        "moscow mule",
+        "sex on the beach",
+      ],
     ],
   ];
 
@@ -185,12 +339,17 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const [selected, setSelected] = useState<MenuItem | null>(null);
+  const [selectedSpecial, setSelectedSpecial] = useState<Special | null>(null);
   const [isBooting, setIsBooting] = useState(true);
   const menuStartRef = useRef<HTMLDivElement>(null);
   const normalized = query.trim().toLowerCase();
   const isCategoryView = activeCategory !== "all";
   const activeCategoryMeta = categories.find(
     (category) => category.slug === activeCategory,
+  );
+  const categoryLookup = useMemo(
+    () => new Map(categories.map((category) => [category.slug, category.name])),
+    [categories],
   );
 
   useEffect(() => {
@@ -281,10 +440,6 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
                 </h1>
               </div>
             </div>
-            <span className="shrink-0 rounded-full bg-hennies-green/20 px-3 py-2 text-xs font-black leading-tight text-hennies-cream ring-1 ring-hennies-green/30">
-              Open
-              <br /> today
-            </span>
           </div>
           <div className="mt-3 flex items-center gap-2 rounded-[1.25rem] border border-white/10 bg-white/10 px-3 py-3 shadow-inner">
             <Search className="h-5 w-5 text-hennies-sky" />
@@ -329,7 +484,11 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
               >
                 <div className="grid gap-3 sm:grid-cols-2">
                   {specials.map((special) => (
-                    <SpecialCard key={special.id} special={special} />
+                    <SpecialCard
+                      key={special.id}
+                      special={special}
+                      onInfo={() => setSelectedSpecial(special)}
+                    />
                   ))}
                 </div>
               </Section>
@@ -345,6 +504,9 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
                     <ItemCard
                       key={item.id}
                       item={item}
+                      categoryName={
+                        categoryLookup.get(item.category_slug) || "Menu"
+                      }
                       onClick={() => setSelected(item)}
                       compact
                     />
@@ -390,6 +552,9 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
                 <ItemCard
                   key={item.id}
                   item={item}
+                  categoryName={
+                    categoryLookup.get(item.category_slug) || "Menu"
+                  }
                   onClick={() => setSelected(item)}
                 />
               ))}
@@ -402,9 +567,9 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
                 className="scroll-mt-36 rounded-[1.75rem] py-4 first:pt-0"
               >
                 {!isCategoryView && (
-                  <div className="mb-4 flex items-end justify-between gap-3 rounded-[1.4rem] border border-white/10 bg-[linear-gradient(135deg,rgba(0,47,95,.58),rgba(7,17,29,.2))] p-4">
+                  <div className="mb-4 flex items-end justify-between gap-3 border-b border-hennies-sky/20 pb-3 pt-3">
                     <div>
-                      <p className="text-xs font-black uppercase tracking-[0.22em] text-hennies-sky">
+                      <p className="text-[11px] font-black uppercase tracking-[0.26em] text-hennies-sky">
                         {category.description}
                       </p>
                       <h3 className="text-3xl font-black leading-none">
@@ -421,6 +586,9 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
                     <ItemCard
                       key={item.id}
                       item={item}
+                      categoryName={
+                        categoryLookup.get(item.category_slug) || category.name
+                      }
                       onClick={() => setSelected(item)}
                     />
                   ))}
@@ -442,6 +610,12 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
       </footer>
       {selected && (
         <ItemModal item={selected} onClose={() => setSelected(null)} />
+      )}
+      {selectedSpecial && (
+        <SpecialModal
+          special={selectedSpecial}
+          onClose={() => setSelectedSpecial(null)}
+        />
       )}
     </main>
   );
@@ -510,25 +684,30 @@ function Section({
   tight?: boolean;
 }) {
   return (
-    <section className={tight ? "mt-2" : "mt-8"}>
-      <div className="mb-4 overflow-hidden rounded-[1.35rem] border border-hennies-sky/15 bg-[linear-gradient(135deg,rgba(0,47,95,.78),rgba(35,32,33,.52))] shadow-[inset_0_1px_0_rgba(255,255,255,.08)]">
-        <div className="h-1.5 bg-[linear-gradient(90deg,#f47c20,#f0ab00,#52c6e2)]" />
-        <div className="p-4">
-          <p className="mb-1 text-[10px] font-black uppercase tracking-[0.24em] text-hennies-orange">
-            Hennie’s menu board
-          </p>
-          <h2 className="text-3xl font-black leading-tight text-hennies-cream sm:text-4xl">
-            {title}
-          </h2>
-          <p className="mt-1 text-sm font-semibold text-white/66">{subtitle}</p>
-        </div>
+    <section className={tight ? "mt-3" : "mt-10"}>
+      <div className="mb-5 border-l-4 border-hennies-orange pl-4">
+        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-hennies-sky">
+          Hennie’s menu
+        </p>
+        <h2 className="mt-1 text-3xl font-black leading-none text-hennies-cream sm:text-4xl">
+          {title}
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm font-semibold text-white/62">
+          {subtitle}
+        </p>
       </div>
       {children}
     </section>
   );
 }
 
-function SpecialCard({ special }: { special: Special }) {
+function SpecialCard({
+  special,
+  onInfo,
+}: {
+  special: Special;
+  onInfo: () => void;
+}) {
   return (
     <article className="overflow-hidden rounded-[1.5rem] border border-hennies-orange/30 bg-hennies-charcoal shadow-[0_12px_30px_rgba(0,0,0,.25)]">
       <HenniesImage
@@ -548,6 +727,14 @@ function SpecialCard({ special }: { special: Special }) {
         <p className="mt-2 text-sm font-medium leading-relaxed text-white/72">
           {special.description}
         </p>
+        <button
+          type="button"
+          onClick={onInfo}
+          className="mt-4 inline-flex items-center gap-2 rounded-full bg-hennies-cream px-3 py-2 text-xs font-black text-hennies-navy"
+          aria-label={`View details for ${special.title}`}
+        >
+          <Info className="h-4 w-4" /> Special info
+        </button>
       </div>
     </article>
   );
@@ -557,10 +744,12 @@ function ItemCard({
   item,
   onClick,
   compact = false,
+  categoryName,
 }: {
   item: MenuItem;
   onClick: () => void;
   compact?: boolean;
+  categoryName: string;
 }) {
   return (
     <article
@@ -594,6 +783,9 @@ function ItemCard({
         </div>
       </div>
       <div className="flex min-h-full flex-col border-l border-hennies-orange/10 p-3.5 sm:border-l-0 sm:border-t sm:p-4">
+        <div className="mb-2 inline-flex w-fit rounded-full bg-hennies-navy/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-hennies-navy">
+          {categoryName}
+        </div>
         <div className="flex items-start justify-between gap-2">
           <h3 className="min-w-0 text-lg font-black leading-[1.05] tracking-[-0.02em] sm:text-xl">
             {item.name}
@@ -784,6 +976,58 @@ function ItemModal({ item, onClose }: { item: MenuItem; onClose: () => void }) {
           <div className="mt-5 rounded-2xl bg-white p-3 text-sm font-bold text-slate-600 shadow-inner">
             Please confirm ingredients and allergens with the branch team if you
             have a dietary requirement.
+          </div>
+        </div>
+      </article>
+    </div>
+  );
+}
+
+function SpecialModal({
+  special,
+  onClose,
+}: {
+  special: Special;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black/70 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <article
+        onClick={(event) => event.stopPropagation()}
+        className="mx-auto max-h-[92vh] max-w-lg overflow-auto rounded-[1.75rem] bg-hennies-charcoal text-white shadow-2xl"
+      >
+        <div className="relative">
+          <HenniesImage
+            src={special.image_url}
+            alt={special.title}
+            className="h-72 w-full"
+            width={760}
+            quality={60}
+            priority
+          />
+          <button
+            onClick={onClose}
+            className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-hennies-cream/95 text-hennies-navy shadow-xl"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <div className="p-5">
+          <p className="text-xs font-black uppercase tracking-[0.24em] text-hennies-orange">
+            {special.is_global ? "Global promotion" : "Branch promotion"}
+          </p>
+          <h2 className="mt-2 text-3xl font-black leading-tight">
+            {special.title}
+          </h2>
+          <p className="mt-3 text-sm font-semibold leading-relaxed text-white/75">
+            {special.description}
+          </p>
+          <div className="mt-5 rounded-2xl bg-white/8 p-4 text-sm font-semibold text-white/70">
+            Promotions may vary by branch and availability. Please confirm
+            current details with the branch team.
           </div>
         </div>
       </article>

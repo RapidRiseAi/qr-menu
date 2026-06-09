@@ -101,6 +101,31 @@ const imageMap: Record<string, string> = {
   beer: "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=900&q=80",
   cocktail:
     "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=900&q=80",
+  fries:
+    "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?auto=format&fit=crop&w=900&q=80",
+  nachos:
+    "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=900&q=80",
+  hotdog:
+    "https://images.unsplash.com/photo-1612392062631-94dd858cba88?auto=format&fit=crop&w=900&q=80",
+  ribs: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
+  calamari:
+    "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=900&q=80",
+  mushrooms:
+    "https://images.unsplash.com/photo-1504545102780-26774c1bb073?auto=format&fit=crop&w=900&q=80",
+  mozzarella:
+    "https://images.unsplash.com/photo-1541014741259-de529411b96a?auto=format&fit=crop&w=900&q=80",
+  omelette:
+    "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=900&q=80",
+  tea: "https://images.unsplash.com/photo-1547825407-2d060104b7f8?auto=format&fit=crop&w=900&q=80",
+  soda: "https://images.unsplash.com/photo-1580391947416-62d0d0a2cf5d?auto=format&fit=crop&w=900&q=80",
+  milkshake:
+    "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=900&q=80",
+  water:
+    "https://images.unsplash.com/photo-1564419320461-6870880221ad?auto=format&fit=crop&w=900&q=80",
+  cider:
+    "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?auto=format&fit=crop&w=900&q=80",
+  dessertDrink:
+    "https://images.unsplash.com/photo-1570197788417-0e82375c9371?auto=format&fit=crop&w=900&q=80",
 };
 
 const raw: Array<[string, string, number, string, string[], string[]?]> = [
@@ -977,7 +1002,7 @@ export const menuItems: MenuItem[] = raw.map(
       name,
       description,
       base_price,
-      image_url: imageFor(slug, tags),
+      image_url: imageFor(slug, tags, name),
       media_type: "image",
       tags,
       allergens: allergens || [],
@@ -1006,7 +1031,7 @@ export const specials: Special[] = [
     id: "special-2",
     title: "Burger & Shake Combo",
     description:
-      "A demo branch special to show how franchise teams can promote local offers.",
+      "A branch favourite pairing a loaded burger with a creamy shake.",
     image_url: imageMap.burger,
     is_global: false,
     is_active: true,
@@ -1024,7 +1049,32 @@ export function slugify(value: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 }
-function imageFor(categorySlug: string, tags: string[]) {
+function imageFor(categorySlug: string, tags: string[], itemName: string) {
+  const name = slugify(itemName);
+  if (name.includes("chips") || name.includes("fries")) return imageMap.fries;
+  if (name.includes("nachos")) return imageMap.nachos;
+  if (name.includes("horrog") || name.includes("varkhond"))
+    return imageMap.hotdog;
+  if (name.includes("rib") || name.includes("ribbetjies")) return imageMap.ribs;
+  if (name.includes("calamari")) return imageMap.calamari;
+  if (name.includes("mushroom")) return imageMap.mushrooms;
+  if (name.includes("mozzarella") || name.includes("halloumi"))
+    return imageMap.mozzarella;
+  if (name.includes("omelette") || name.includes("egg"))
+    return imageMap.omelette;
+  if (name.includes("tea") || name.includes("rooibos")) return imageMap.tea;
+  if (
+    name.includes("soda") ||
+    name.includes("red-bull") ||
+    name.includes("appletiser")
+  )
+    return imageMap.soda;
+  if (name.includes("water")) return imageMap.water;
+  if (name.includes("milkshake") || categorySlug.includes("milkshakes"))
+    return imageMap.milkshake;
+  if (name.includes("dom-pedro")) return imageMap.dessertDrink;
+  if (name.includes("savanna") || name.includes("hunter"))
+    return imageMap.cider;
   if (categorySlug.includes("pizza")) return imageMap.pizza;
   if (categorySlug.includes("burger")) return imageMap.burger;
   if (categorySlug.includes("wing")) return imageMap.wings;
@@ -1032,8 +1082,7 @@ function imageFor(categorySlug: string, tags: string[]) {
   if (categorySlug.includes("salad")) return imageMap.salad;
   if (categorySlug.includes("sweet")) return imageMap.dessert;
   if (categorySlug.includes("hot-drinks")) return imageMap.coffee;
-  if (categorySlug.includes("cold") || categorySlug.includes("milk"))
-    return imageMap.drink;
+  if (categorySlug.includes("cold")) return imageMap.drink;
   if (categorySlug.includes("beer")) return imageMap.beer;
   if (
     categorySlug.includes("cocktail") ||
