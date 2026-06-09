@@ -110,6 +110,7 @@ const expectedMenuNames = [
 
 const normalize = (value) => value.toLowerCase().replaceAll("’", "'");
 const demoData = normalize(readFileSync("lib/menu/demo-data.ts", "utf8"));
+const seedSql = readFileSync("supabase/seed.sql", "utf8");
 const missing = expectedMenuNames.filter(
   (name) => !demoData.includes(normalize(name)),
 );
@@ -120,6 +121,21 @@ if (missing.length) {
   process.exit(1);
 }
 
+const menuImageUrls = [
+  ...seedSql.matchAll(/insert into menu_items[\s\S]*?'(https?:\/\/[^']+)'\s*, 'image'/g),
+].map((match) => match[1]);
+const uniqueImageUrls = new Set(menuImageUrls);
+
+if (menuImageUrls.length !== uniqueImageUrls.size) {
+  console.error(
+    `Expected unique menu item images, got ${uniqueImageUrls.size} unique URLs for ${menuImageUrls.length} menu seed rows.`,
+  );
+  process.exit(1);
+}
+
 console.log(
   `All ${expectedMenuNames.length} checked Hennie’s food/drinks/menu names are present in lib/menu/demo-data.ts.`,
+);
+console.log(
+  `All ${menuImageUrls.length} seeded menu item image URLs are unique.`,
 );

@@ -1293,47 +1293,133 @@ export function slugify(value: string) {
 }
 function imageFor(categorySlug: string, tags: string[], itemName: string) {
   const name = slugify(itemName);
-  if (name.includes("chips") || name.includes("fries")) return imageMap.fries;
-  if (name.includes("nachos")) return imageMap.nachos;
-  if (name.includes("horrog") || name.includes("varkhond"))
-    return imageMap.hotdog;
-  if (name.includes("rib") || name.includes("ribbetjies")) return imageMap.ribs;
-  if (name.includes("calamari")) return imageMap.calamari;
-  if (name.includes("mushroom")) return imageMap.mushrooms;
-  if (name.includes("mozzarella") || name.includes("halloumi"))
-    return imageMap.mozzarella;
-  if (name.includes("omelette") || name.includes("egg"))
-    return imageMap.omelette;
-  if (name.includes("tea") || name.includes("rooibos")) return imageMap.tea;
-  if (
-    name.includes("soda") ||
-    name.includes("red-bull") ||
-    name.includes("appletiser")
-  )
-    return imageMap.soda;
-  if (name.includes("water")) return imageMap.water;
-  if (name.includes("milkshake") || categorySlug.includes("milkshakes"))
-    return imageMap.milkshake;
-  if (name.includes("dom-pedro")) return imageMap.dessertDrink;
-  if (name.includes("savanna") || name.includes("hunter"))
-    return imageMap.cider;
-  if (categorySlug.includes("pizza")) return imageMap.pizza;
-  if (categorySlug.includes("burger")) return imageMap.burger;
-  if (categorySlug.includes("wing")) return imageMap.wings;
-  if (categorySlug.includes("vleis")) return imageMap.steak;
-  if (categorySlug.includes("salad")) return imageMap.salad;
-  if (categorySlug.includes("sweet")) return imageMap.dessert;
-  if (categorySlug.includes("hot-drinks")) return imageMap.coffee;
-  if (categorySlug.includes("cold")) return imageMap.drink;
-  if (categorySlug.includes("beer")) return imageMap.beer;
-  if (
-    categorySlug.includes("cocktail") ||
-    categorySlug.includes("non-alcoholic")
-  )
-    return imageMap.cocktail;
-  if (categorySlug.includes("brekk")) return imageMap.breakfast;
-  if (tags.includes("shareable")) return imageMap.share;
-  return imageMap.starter;
+  const query = imageQueryFor(categorySlug, tags, name, itemName);
+  return menuPhotoUrl(query, itemName);
+}
+
+function imageQueryFor(
+  categorySlug: string,
+  tags: string[],
+  normalizedName: string,
+  itemName: string,
+) {
+  if (normalizedName.includes("strawberry-milkshake"))
+    return "strawberry milkshake";
+  if (normalizedName.includes("chocolate-milkshake"))
+    return "chocolate milkshake";
+  if (normalizedName.includes("vanilla-milkshake")) return "vanilla milkshake";
+  if (normalizedName.includes("bubblegum")) return "blue bubblegum milkshake";
+  if (normalizedName.includes("salted-caramel"))
+    return "caramel milkshake";
+  if (normalizedName.includes("nutella")) return "hazelnut chocolate shake";
+  if (normalizedName.includes("bloody-mary")) return "bloody mary cocktail";
+  if (normalizedName.includes("mojito")) return "mojito cocktail";
+  if (normalizedName.includes("daiquiri") || normalizedName.includes("inge"))
+    return "frozen fruit cocktail";
+  if (normalizedName.includes("sunset")) return "orange tropical cocktail";
+  if (normalizedName.includes("ginger-ninja")) return "ginger cocktail";
+  if (normalizedName.includes("colada")) return "pina colada cocktail";
+  if (normalizedName.includes("margarita")) return "strawberry margarita";
+  if (normalizedName.includes("virgin")) return "mocktail fruit drink";
+  if (normalizedName.includes("rock-shandy")) return "lemon soda drink";
+  if (normalizedName.includes("non-alcoholic-lager")) return "non alcoholic beer";
+  if (normalizedName.includes("castle") || normalizedName.includes("black-label"))
+    return "south african lager beer";
+  if (normalizedName.includes("stella")) return "lager beer glass";
+  if (normalizedName.includes("hunter") || normalizedName.includes("savanna"))
+    return "apple cider bottle";
+  if (normalizedName.includes("americano")) return "black coffee cup";
+  if (normalizedName.includes("cappuccino")) return "cappuccino cup";
+  if (normalizedName.includes("cafe-latte")) return "cafe latte";
+  if (normalizedName.includes("mochaccino")) return "mocha coffee";
+  if (normalizedName.includes("five-roses") || normalizedName.includes("rooibos"))
+    return "hot tea cup";
+  if (normalizedName.includes("water")) return "sparkling water bottle";
+  if (normalizedName.includes("red-bull")) return "energy drink can";
+  if (normalizedName.includes("appletiser")) return "sparkling apple drink";
+  if (normalizedName.includes("tomato-juice")) return "tomato juice glass";
+  if (normalizedName.includes("sir-fruit")) return "fruit juice bottle";
+  if (normalizedName.includes("ice-tea")) return "iced tea glass";
+  if (normalizedName.includes("soda")) return "soft drink cans";
+  if (normalizedName.includes("calzone")) return "calzone pizza";
+  if (normalizedName.includes("pepperoni")) return "pepperoni pizza";
+  if (normalizedName.includes("hawaiian")) return "hawaiian pizza";
+  if (normalizedName.includes("regina")) return "ham mushroom pizza";
+  if (normalizedName.includes("jalapeno-popper-pizza"))
+    return "jalapeno pizza";
+  if (normalizedName.includes("varkhond-pizza")) return "bbq pork pizza";
+  if (normalizedName.includes("horrog-heaven")) return "hot dog pizza";
+  if (categorySlug.includes("pizza")) return `${itemName} pizza`;
+  if (normalizedName.includes("cookie")) return "cookies and cream dessert";
+  if (normalizedName.includes("dom-pedro")) return "cream dessert cocktail";
+  if (normalizedName.includes("malva")) return "malva pudding custard";
+  if (normalizedName.includes("brownie")) return "chocolate brownie dessert";
+  if (normalizedName.includes("loaded-fries") || normalizedName.includes("tjippies"))
+    return "loaded fries";
+  if (normalizedName.includes("chips") || normalizedName.includes("fries"))
+    return "french fries";
+  if (normalizedName.includes("nachos")) return "loaded nachos";
+  if (normalizedName.includes("horrog") || normalizedName.includes("varkhond"))
+    return "loaded hot dog";
+  if (normalizedName.includes("burger")) return `${itemName} burger`;
+  if (normalizedName.includes("rib") || normalizedName.includes("ribbetjies"))
+    return "bbq pork ribs";
+  if (normalizedName.includes("buffalo") || normalizedName.includes("wings"))
+    return "buffalo chicken wings";
+  if (normalizedName.includes("calamari")) return "crispy calamari";
+  if (normalizedName.includes("mushroom")) return "crumbed mushrooms";
+  if (normalizedName.includes("mozzarella")) return "mozzarella bites";
+  if (normalizedName.includes("halloumi")) return "fried halloumi";
+  if (normalizedName.includes("jalapeno")) return "jalapeno poppers";
+  if (normalizedName.includes("focaccia")) return "garlic focaccia bread";
+  if (normalizedName.includes("braaibroodjie")) return "grilled cheese sandwich";
+  if (normalizedName.includes("omelette")) return "cheese omelette";
+  if (normalizedName.includes("brekkie") || normalizedName.includes("breakfast"))
+    return "fried breakfast eggs bacon";
+  if (normalizedName.includes("rump") || normalizedName.includes("steak"))
+    return "grilled steak plate";
+  if (normalizedName.includes("t-bone")) return "t bone steak";
+  if (normalizedName.includes("schnitzel")) return "chicken schnitzel";
+  if (normalizedName.includes("eisbein")) return "pork knuckle eisbein";
+  if (normalizedName.includes("bakkie")) return "loaded food basket";
+  if (normalizedName.includes("greek") || normalizedName.includes("griekse"))
+    return "greek salad feta";
+  if (normalizedName.includes("chicken-salad")) return "grilled chicken salad";
+  if (normalizedName.includes("halloumi-salad")) return "halloumi salad";
+  if (categorySlug.includes("salad")) return "fresh pub salad";
+  if (normalizedName.includes("pap")) return "pap tomato relish";
+  if (normalizedName.includes("butternut")) return "roasted butternut";
+  if (normalizedName.includes("spinach")) return "creamed spinach";
+  if (normalizedName.includes("onion-rings")) return "crispy onion rings";
+  if (normalizedName.includes("sauce") || normalizedName.includes("dips"))
+    return "dipping sauce bowls";
+  if (categorySlug.includes("cocktail") || categorySlug.includes("non-alcoholic"))
+    return "bar drinks cocktails";
+  if (categorySlug.includes("beer")) return "beer cider bottles";
+  if (categorySlug.includes("cold")) return "cold soft drink glass";
+  if (categorySlug.includes("hot-drinks")) return "coffee cup";
+  if (categorySlug.includes("sweet")) return "restaurant dessert";
+  if (categorySlug.includes("vleis")) return "grilled meat plate";
+  if (tags.includes("shareable")) return "pub platter sharing food";
+  return `${itemName} restaurant food`;
+}
+
+function menuPhotoUrl(query: string, itemName: string) {
+  const cleanedQuery = query
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ",")
+    .replace(/^,+|,+$/g, "") || "restaurant,food";
+  return `https://loremflickr.com/900/650/${cleanedQuery}?lock=${stableImageLock(
+    itemName,
+  )}`;
+}
+
+function stableImageLock(value: string) {
+  let hash = 0;
+  for (const char of value) {
+    hash = (hash * 31 + char.charCodeAt(0)) % 100000;
+  }
+  return hash + 1000;
 }
 
 export function getBranchBySlug(slug: string): Branch | undefined {
