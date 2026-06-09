@@ -7,7 +7,7 @@ export default async function PublicMenuPage({ params }: Props) {
   const { branch_slug } = await params;
   const branch = getBranchBySlug(branch_slug);
   if (!branch) notFound();
-  const menu = menuForBranch();
+  const menu = menuForBranch(branch_slug);
   return (
     <MenuExperience
       branch={branch}

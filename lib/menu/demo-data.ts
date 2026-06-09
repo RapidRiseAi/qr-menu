@@ -1097,6 +1097,35 @@ function imageFor(categorySlug: string, tags: string[], itemName: string) {
 export function getBranchBySlug(slug: string): Branch | undefined {
   return PUBLIC_BRANCHES.find((branch) => branch.slug === slug);
 }
-export function menuForBranch() {
-  return { categories, items: menuItems, specials };
+export function menuForBranch(branchSlug?: string) {
+  const items = menuItems.map((item) =>
+    applyDemoBranchOverride(item, branchSlug),
+  );
+  const branchSpecials = specials.map((special) => ({
+    ...special,
+    is_global: special.is_global || branchSlug !== "hennies-nelspruit",
+  }));
+  return { categories, items, specials: branchSpecials };
+}
+
+function applyDemoBranchOverride(
+  item: MenuItem,
+  branchSlug?: string,
+): MenuItem {
+  if (branchSlug === "hennies-boksburg" && item.name === "Rump 300g") {
+    return { ...item, base_price: item.base_price + 15, is_sold_out: true };
+  }
+  if (
+    branchSlug === "hennies-randburg" &&
+    item.name === "Classic Hennies Burger"
+  ) {
+    return { ...item, base_price: item.base_price + 10, is_popular: true };
+  }
+  if (
+    branchSlug === "hennies-nelspruit" &&
+    item.name === "330g Buffalo Wings"
+  ) {
+    return { ...item, is_sold_out: true };
+  }
+  return item;
 }

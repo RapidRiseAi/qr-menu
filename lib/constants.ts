@@ -16,6 +16,7 @@ export const STORAGE_BUCKET =
   process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || "menu-media";
 export const PUBLIC_BRANCHES = [
   {
+    id: "11111111-1111-1111-1111-111111111111",
     name: "Hennie’s Nelspruit",
     slug: "hennies-nelspruit",
     address: "Nelspruit",
@@ -25,6 +26,7 @@ export const PUBLIC_BRANCHES = [
     trading_hours: "Open daily",
   },
   {
+    id: "22222222-2222-2222-2222-222222222222",
     name: "Hennie’s Boksburg",
     slug: "hennies-boksburg",
     address: "Boksburg",
@@ -34,6 +36,7 @@ export const PUBLIC_BRANCHES = [
     trading_hours: "Open daily",
   },
   {
+    id: "33333333-3333-3333-3333-333333333333",
     name: "Hennie’s Randburg",
     slug: "hennies-randburg",
     address: "Randburg",

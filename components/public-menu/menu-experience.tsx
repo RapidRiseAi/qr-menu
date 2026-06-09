@@ -474,6 +474,29 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
       >
         <div className="absolute inset-x-0 top-0 -z-0 h-72 bg-[radial-gradient(circle_at_top_left,rgba(82,198,226,.18),transparent_38%),radial-gradient(circle_at_top_right,rgba(240,171,0,.16),transparent_40%)]" />
 
+        <aside className="hidden xl:block fixed left-6 top-36 z-20 w-56 rounded-[1.5rem] border border-white/10 bg-hennies-night/85 p-3 shadow-2xl backdrop-blur-xl 2xl:left-[calc((100vw-1500px)/2)]">
+          <p className="px-3 pb-2 text-[10px] font-black uppercase tracking-[0.24em] text-hennies-sky">
+            Quick menu
+          </p>
+          <div className="max-h-[60vh] overflow-auto pr-1">
+            <button
+              onClick={() => selectCategory("all")}
+              className={`mb-1 w-full rounded-2xl px-3 py-2 text-left text-xs font-black ${activeCategory === "all" ? "bg-hennies-orange text-white" : "text-white/70 hover:bg-white/10"}`}
+            >
+              Full menu
+            </button>
+            {categories.map((category) => (
+              <button
+                key={category.slug}
+                onClick={() => selectCategory(category.slug)}
+                className={`mb-1 w-full rounded-2xl px-3 py-2 text-left text-xs font-black ${activeCategory === category.slug ? "bg-hennies-orange text-white" : "text-white/70 hover:bg-white/10"}`}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
+        </aside>
+
         {!isCategoryView && !normalized && (
           <>
             <HeroCard />
