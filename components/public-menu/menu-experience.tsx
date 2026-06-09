@@ -1,15 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import {
-  ArrowUp,
-  BadgeInfo,
-  Clock,
-  Flame,
-  Search,
-  Sparkles,
-  X,
-} from "lucide-react";
+import { ArrowUp, Flame, Info, Search, X } from "lucide-react";
 import { BRAND_PLACEHOLDER, POWERED_BY } from "@/lib/constants";
 import type {
   Branch,
@@ -27,6 +19,167 @@ type Props = {
 
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=980&q=58";
+
+const SEARCH_SYNONYMS: Record<string, string[]> = {
+  chips: ["fries", "slap chips", "tjips", "aartappel", "potato"],
+  fries: ["chips", "slap chips", "tjips", "potato"],
+  braaibroodjie: [
+    "braai broodjie",
+    "braai brood",
+    "toast",
+    "toasted",
+    "sandwich",
+    "grilled cheese",
+    "bread",
+  ],
+  braai: ["grill", "grilled", "barbecue", "bbq"],
+  broodjie: ["bread", "toast", "sandwich", "roll"],
+  burger: ["burgertjie", "patty", "beef burger"],
+  hotdog: ["hot dog", "horrog", "varkhondjie", "varkhond"],
+  horrog: ["hot dog", "hotdog", "wors", "sausage"],
+  ribs: ["ribbetjies", "ribs", "pork ribs"],
+  ribbetjies: ["ribs", "pork ribs"],
+  chicken: ["kippie", "hoender", "strips", "strippies", "wings"],
+  kippie: ["chicken", "hoender"],
+  steak: ["rump", "t-bone", "vleis", "beef"],
+  vleis: ["meat", "beef", "steak"],
+  breakfast: ["brekkie", "brêkkie", "brakkies", "eggs"],
+  brekkie: ["breakfast", "eggs"],
+  bakkie: ["basket", "bowl", "loaded"],
+  pizza: ["flatbread", "slice"],
+  coffee: ["americano", "cappuccino", "latte", "espresso", "koffie"],
+  beer: ["bier", "lager", "draught", "dumpie"],
+};
+
+function expandSearchTokens(search: string) {
+  const normalizedSearch = normalizeSearchText(search);
+  const baseTokens = tokenize(normalizedSearch);
+  const expanded = new Set([...baseTokens, normalizedSearch]);
+
+  baseTokens.forEach((token) => {
+    SEARCH_SYNONYMS[token]?.forEach((synonym) => {
+      expanded.add(synonym);
+      tokenize(synonym).forEach((part) => expanded.add(part));
+    });
+  });
+
+  Object.entries(SEARCH_SYNONYMS).forEach(([key, synonyms]) => {
+    if (synonyms.some((synonym) => normalizedSearch.includes(synonym))) {
+      expanded.add(key);
+      tokenize(key).forEach((part) => expanded.add(part));
+    }
+  });
+
+  return [...expanded].filter((token) => token.length > 1);
+}
+
+function scoreMenuItem(item: MenuItem, search: string) {
+  const query = normalizeSearchText(search);
+  const tokens = expandSearchTokens(search);
+  const name = normalizeSearchText(item.name);
+  const description = normalizeSearchText(item.description);
+  const tags = normalizeSearchText(item.tags.join(" "));
+  const allergens = normalizeSearchText(item.allergens.join(" "));
+  const ingredients = getItemIngredients(item);
+  const ingredientsText = normalizeSearchText(ingredients.join(" "));
+  const primaryIngredients = ingredients.slice(0, 3).map(normalizeSearchText);
+  let score = 0;
+
+  if (name === query) score += 1000;
+  if (name.startsWith(query)) score += 850;
+  if (name.includes(query)) score += 680;
+  if (
+    primaryIngredients.some(
+      (ingredient) => ingredient === query || ingredient.includes(query),
+    )
+  )
+    score += 560;
+  if (ingredientsText.includes(query)) score += 430;
+  if (description.includes(query)) score += 220;
+  if (tags.includes(query)) score += 180;
+  if (allergens.includes(query)) score += 120;
+
+  tokens.forEach((token) => {
+    if (name.split(" ").includes(token)) score += 120;
+    else if (name.includes(token)) score += 92;
+
+    if (
+      primaryIngredients.some(
+        (ingredient) =>
+          ingredient.split(" ").includes(token) || ingredient.includes(token),
+      )
+    )
+      score += 82;
+    else if (ingredientsText.includes(token)) score += 58;
+
+    if (description.includes(token)) score += 26;
+    if (tags.includes(token)) score += 18;
+  });
+
+  if (item.is_popular && score > 0) score += 8;
+  return score;
+}
+
+function getItemIngredients(item: MenuItem) {
+  const text = normalizeSearchText(
+    `${item.name} ${item.description} ${item.tags.join(" ")}`,
+  );
+  const ingredients: string[] = [];
+  const add = (ingredient: string) => {
+    if (!ingredients.includes(ingredient)) ingredients.push(ingredient);
+  };
+
+  const checks: Array<[string, string[]]> = [
+    ["chips / fries", ["chips", "fries", "loaded fries", "slap"]],
+    ["braai toast bread", ["braaibroodjie", "broodjie", "toast", "bread"]],
+    ["beef", ["beef", "rump", "steak", "t-bone", "patty", "burger"]],
+    ["chicken", ["chicken", "kippie", "wings", "schnitzel", "strippies"]],
+    [
+      "pork",
+      ["pork", "vark", "eisbein", "rib", "ribbetjies", "bacon", "pulled pork"],
+    ],
+    ["cheese", ["cheese", "cheesy", "mozzarella", "feta", "halloumi"]],
+    ["egg", ["egg", "omelette", "breakfast", "brekkie"]],
+    ["mushrooms", ["mushroom", "mushrooms"]],
+    ["jalapeño", ["jalapeno", "jalapeño", "popper"]],
+    ["tomato", ["tomato", "salsa"]],
+    ["lettuce / greens", ["lettuce", "greens", "salad", "rocket"]],
+    ["pizza base", ["pizza", "focaccia"]],
+    [
+      "coffee",
+      ["coffee", "americano", "cappuccino", "latte", "mochaccino", "espresso"],
+    ],
+    ["milk", ["milkshake", "latte", "cappuccino", "milk", "cream"]],
+    ["beer", ["beer", "lager", "lite", "stella", "black label"]],
+    ["cider", ["cider", "savanna", "hunter"]],
+    [
+      "cocktail mix",
+      ["cocktail", "mojito", "daiquiri", "margarita", "bloody mary"],
+    ],
+  ];
+
+  checks.forEach(([ingredient, needles]) => {
+    if (needles.some((needle) => text.includes(normalizeSearchText(needle))))
+      add(ingredient);
+  });
+
+  item.tags.forEach((tag) => add(tag));
+  return ingredients.slice(0, 8);
+}
+
+function normalizeSearchText(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[’']/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function tokenize(value: string) {
+  return normalizeSearchText(value).split(" ").filter(Boolean);
+}
 
 export function MenuExperience({ branch, categories, items, specials }: Props) {
   const [query, setQuery] = useState("");
@@ -62,21 +215,25 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
     return () => window.clearTimeout(timer);
   }, [items]);
 
-  const filtered = useMemo(
-    () =>
-      items.filter((item) => {
-        const matchesQuery =
-          !normalized ||
-          [item.name, item.description, item.tags.join(" ")]
-            .join(" ")
-            .toLowerCase()
-            .includes(normalized);
-        const matchesCategory =
-          activeCategory === "all" || item.category_slug === activeCategory;
-        return matchesQuery && matchesCategory && item.is_available_global;
-      }),
-    [activeCategory, items, normalized],
-  );
+  const filtered = useMemo(() => {
+    const activeItems = items.filter((item) => item.is_available_global);
+
+    if (normalized) {
+      return activeItems
+        .map((item) => ({ item, score: scoreMenuItem(item, normalized) }))
+        .filter(({ score }) => score > 0)
+        .sort(
+          (a, b) =>
+            b.score - a.score || a.item.display_order - b.item.display_order,
+        )
+        .map(({ item }) => item);
+    }
+
+    return activeItems.filter(
+      (item) =>
+        activeCategory === "all" || item.category_slug === activeCategory,
+    );
+  }, [activeCategory, items, normalized]);
 
   const popular = items
     .filter((item) => item.is_popular && item.is_available_global)
@@ -134,7 +291,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search burgers, wings, drinks, pizzas…"
+              placeholder="Search burgers, chips, braaibroodjie, cocktails…"
               className="w-full bg-transparent text-[16px] font-semibold text-white outline-none placeholder:text-white/48"
             />
           </div>
@@ -165,24 +322,6 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
         {!isCategoryView && !normalized && (
           <>
             <HeroCard />
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <InfoCard
-                icon={<Clock className="h-5 w-5" />}
-                label="Trading hours"
-                value={branch.trading_hours}
-              />
-              <InfoCard
-                icon={<BadgeInfo className="h-5 w-5" />}
-                label="Branch"
-                value={branch.address}
-              />
-              <InfoCard
-                icon={<Sparkles className="h-5 w-5" />}
-                label="Service buttons"
-                value="Optional future feature — browse now, order with staff."
-              />
-            </div>
-
             {specials.length > 0 && (
               <Section
                 title="Specials & promotions"
@@ -245,38 +384,50 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
             </div>
           )}
 
-          {grouped.map(({ category, items: groupItems }) => (
-            <div
-              key={category.slug}
-              id={category.slug}
-              className="scroll-mt-36 rounded-[1.75rem] py-4 first:pt-0"
-            >
-              {!isCategoryView && (
-                <div className="mb-4 flex items-end justify-between gap-3 rounded-[1.4rem] border border-white/10 bg-[linear-gradient(135deg,rgba(0,47,95,.58),rgba(7,17,29,.2))] p-4">
-                  <div>
-                    <p className="text-xs font-black uppercase tracking-[0.22em] text-hennies-sky">
-                      {category.description}
-                    </p>
-                    <h3 className="text-3xl font-black leading-none">
-                      {category.name}
-                    </h3>
-                  </div>
-                  <span className="rounded-full bg-hennies-orange px-3 py-1 text-xs font-black text-white shadow-orange">
-                    {groupItems.length}
-                  </span>
-                </div>
-              )}
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {groupItems.map((item) => (
-                  <ItemCard
-                    key={item.id}
-                    item={item}
-                    onClick={() => setSelected(item)}
-                  />
-                ))}
-              </div>
+          {normalized ? (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {filtered.map((item) => (
+                <ItemCard
+                  key={item.id}
+                  item={item}
+                  onClick={() => setSelected(item)}
+                />
+              ))}
             </div>
-          ))}
+          ) : (
+            grouped.map(({ category, items: groupItems }) => (
+              <div
+                key={category.slug}
+                id={category.slug}
+                className="scroll-mt-36 rounded-[1.75rem] py-4 first:pt-0"
+              >
+                {!isCategoryView && (
+                  <div className="mb-4 flex items-end justify-between gap-3 rounded-[1.4rem] border border-white/10 bg-[linear-gradient(135deg,rgba(0,47,95,.58),rgba(7,17,29,.2))] p-4">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.22em] text-hennies-sky">
+                        {category.description}
+                      </p>
+                      <h3 className="text-3xl font-black leading-none">
+                        {category.name}
+                      </h3>
+                    </div>
+                    <span className="rounded-full bg-hennies-orange px-3 py-1 text-xs font-black text-white shadow-orange">
+                      {groupItems.length}
+                    </span>
+                  </div>
+                )}
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  {groupItems.map((item) => (
+                    <ItemCard
+                      key={item.id}
+                      item={item}
+                      onClick={() => setSelected(item)}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
           {filtered.length === 0 && <EmptyState />}
         </Section>
       </section>
@@ -316,8 +467,8 @@ function HeroCard() {
           Blêrrie lekker food, drinks & branch specials.
         </h2>
         <p className="mt-3 max-w-xl text-sm font-semibold text-white/82 sm:text-base">
-          Scan once per branch. Browse photos, prices, allergens and promos —
-          then order with your waiter.
+          Browse signature food, ice-cold drinks, specials, prices, allergens
+          and ingredients.
         </p>
       </div>
     </div>
@@ -344,30 +495,6 @@ function CategoryTab({
     >
       {label}
     </button>
-  );
-}
-
-function InfoCard({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-white/7 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,.06)]">
-      <div className="flex items-center gap-2 text-hennies-sky">
-        {icon}
-        <span className="text-xs font-black uppercase tracking-[0.2em]">
-          {label}
-        </span>
-      </div>
-      <p className="mt-2 text-sm font-bold leading-relaxed text-white/86">
-        {value}
-      </p>
-    </div>
   );
 }
 
@@ -436,9 +563,14 @@ function ItemCard({
   compact?: boolean;
 }) {
   return (
-    <button
+    <article
+      role="button"
+      tabIndex={0}
       onClick={onClick}
-      className={`group grid overflow-hidden rounded-[1.35rem] border border-hennies-sky/20 bg-[linear-gradient(180deg,#f2e9df,#fff7ed)] text-left text-hennies-navy shadow-[0_16px_36px_rgba(0,0,0,.32)] ring-1 ring-white/10 transition hover:-translate-y-1 hover:border-hennies-orange/55 hover:shadow-orange ${
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") onClick();
+      }}
+      className={`group grid cursor-pointer overflow-hidden rounded-[1.35rem] border border-hennies-sky/20 bg-[linear-gradient(180deg,#f2e9df,#fff7ed)] text-left text-hennies-navy shadow-[0_16px_36px_rgba(0,0,0,.32)] ring-1 ring-white/10 transition hover:-translate-y-1 hover:border-hennies-orange/55 hover:shadow-orange ${
         compact
           ? "min-w-[78vw] snap-start sm:min-w-[320px]"
           : "grid-cols-[132px_1fr] sm:grid-cols-1"
@@ -473,7 +605,7 @@ function ItemCard({
         <p className="mt-2 line-clamp-3 text-sm font-semibold leading-relaxed text-slate-700 sm:line-clamp-2">
           {item.description}
         </p>
-        <div className="mt-auto flex flex-wrap gap-1.5 pt-3">
+        <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-3">
           {item.tags.slice(0, compact ? 2 : 3).map((tag) => (
             <span
               key={tag}
@@ -482,9 +614,20 @@ function ItemCard({
               #{tag}
             </span>
           ))}
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onClick();
+            }}
+            className="ml-auto inline-flex items-center gap-1 rounded-full bg-hennies-navy px-2.5 py-1 text-[11px] font-black text-hennies-cream shadow-sm"
+            aria-label={`View ingredients for ${item.name}`}
+          >
+            <Info className="h-3.5 w-3.5" /> Info
+          </button>
         </div>
       </div>
-    </button>
+    </article>
   );
 }
 
@@ -615,16 +758,32 @@ function ItemModal({ item, onClose }: { item: MenuItem; onClose: () => void }) {
           </div>
           <div className="mt-4">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
+              Ingredients & key components
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {getItemIngredients(item).map((ingredient) => (
+                <span
+                  key={ingredient}
+                  className="rounded-full bg-white px-3 py-1 text-xs font-black text-hennies-navy shadow-inner"
+                >
+                  {ingredient}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="mt-4">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
               Allergens
             </p>
             <p className="mt-1 text-sm font-medium text-slate-700">
               {item.allergens.length
                 ? item.allergens.join(", ")
-                : "Ask your waiter if you have dietary requirements."}
+                : "No common allergens listed for this item."}
             </p>
           </div>
           <div className="mt-5 rounded-2xl bg-white p-3 text-sm font-bold text-slate-600 shadow-inner">
-            Menu browsing only — please order with your waiter.
+            Please confirm ingredients and allergens with the branch team if you
+            have a dietary requirement.
           </div>
         </div>
       </article>
