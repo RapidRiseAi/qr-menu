@@ -2,11 +2,15 @@ export const APP_NAME = "Hennies Digital Menu OS";
 export const BRAND_PLACEHOLDER = "Hennie’s Digital Menu";
 export const POWERED_BY = "Powered by Rapid Rise AI";
 export const BRAND = {
-  navy: "#071a2f",
-  navy2: "#0b2440",
-  orange: "#ff7a1a",
-  aqua: "#19d3d1",
-  cream: "#fff8ea",
+  night: "#07111d",
+  navy: "#002f5f",
+  navy2: "#123d68",
+  charcoal: "#232021",
+  orange: "#f47c20",
+  gold: "#f0ab00",
+  aqua: "#52c6e2",
+  cream: "#f2e9df",
+  green: "#25d366",
 };
 export const STORAGE_BUCKET =
   process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || "menu-media";

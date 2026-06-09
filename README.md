@@ -16,6 +16,10 @@ A branded, mobile-first visual digital menu system for Hennie’s Sports Bar-sty
 
 No copyrighted Hennie’s logo or proprietary food photography is hardcoded. The UI uses a placeholder text logo (`Hennie’s Digital Menu`) and safe placeholder image URLs. Upload approved brand assets and official photography through the media/admin flows before production use.
 
+## Brand research notes
+
+The public Hennie’s site presents a sportsbar/pub franchise tone with Afrikaans-flavoured section names such as `LIGTE HAPPE`, `BUFFALO WINGS`, `BLÊRRIE LEKKER BURGERS`, `GROOT HAPPE`, and `BRAKKE BREKKIES`. Its production CSS includes a deep navy (`#002f5f`), bright sky blue (`#52c6e2`), warm gold (`#f0ab00`), cream (`#f2e9df`), and WhatsApp green (`#25d366`). This project uses those as the Hennie’s-inspired palette while keeping the uploaded logo placeholder legally safe.
+
 ## Routes
 
 - `/` — landing page

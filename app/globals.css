@@ -8,7 +8,7 @@ html {
   scroll-behavior: smooth;
 }
 body {
-  @apply bg-hennies-navy text-white antialiased;
+  @apply bg-hennies-night text-white antialiased;
 }
 input,
 textarea,
@@ -21,6 +21,23 @@ select {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+.hennies-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    110deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0.08)
+  );
+  background-size: 200% 100%;
+  animation: hennies-shimmer 1.05s linear infinite;
+}
+@keyframes hennies-shimmer {
+  to {
+    background-position-x: -200%;
+  }
 }
 .print-only {
   display: none;

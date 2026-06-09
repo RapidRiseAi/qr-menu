@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   ArrowUp,
   BadgeInfo,
@@ -25,11 +25,43 @@ type Props = {
   specials: Special[];
 };
 
+const HERO_IMAGE =
+  "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=980&q=58";
+
 export function MenuExperience({ branch, categories, items, specials }: Props) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const [selected, setSelected] = useState<MenuItem | null>(null);
-  const normalized = query.toLowerCase();
+  const [isBooting, setIsBooting] = useState(true);
+  const menuStartRef = useRef<HTMLDivElement>(null);
+  const normalized = query.trim().toLowerCase();
+  const isCategoryView = activeCategory !== "all";
+  const activeCategoryMeta = categories.find(
+    (category) => category.slug === activeCategory,
+  );
+
+  useEffect(() => {
+    const preloadUrls = [
+      HERO_IMAGE,
+      ...items.slice(0, 10).map((i) => i.image_url),
+    ];
+    let loaded = 0;
+    const finish = () => {
+      loaded += 1;
+      if (loaded >= Math.min(preloadUrls.length, 7)) setIsBooting(false);
+    };
+    const timer = window.setTimeout(() => setIsBooting(false), 900);
+    preloadUrls.forEach((url) => {
+      const image = new Image();
+      image.decoding = "async";
+      image.loading = "eager";
+      image.onload = finish;
+      image.onerror = finish;
+      image.src = compactImageUrl(url, 640, 55);
+    });
+    return () => window.clearTimeout(timer);
+  }, [items]);
+
   const filtered = useMemo(
     () =>
       items.filter((item) => {
@@ -45,7 +77,10 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
       }),
     [activeCategory, items, normalized],
   );
-  const popular = filtered.filter((item) => item.is_popular).slice(0, 8);
+
+  const popular = items
+    .filter((item) => item.is_popular && item.is_available_global)
+    .slice(0, 8);
   const grouped = categories
     .map((category) => ({
       category,
@@ -53,168 +88,183 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
     }))
     .filter((group) => group.items.length);
 
+  function selectCategory(slug: string) {
+    setActiveCategory(slug);
+    window.requestAnimationFrame(() => {
+      if (slug === "all") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+      menuStartRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }
+
+  if (isBooting) {
+    return <BrandedLoader branchName={branch.name} />;
+  }
+
   return (
-    <main className="min-h-screen overflow-hidden bg-hennies-navy text-white">
-      <section className="sticky top-0 z-40 border-b border-white/10 bg-hennies-navy/92 backdrop-blur-xl">
+    <main className="min-h-screen overflow-hidden bg-hennies-night text-white">
+      <section className="sticky top-0 z-40 border-b border-white/10 bg-hennies-night/95 shadow-[0_12px_35px_rgba(0,0,0,.28)] backdrop-blur-xl">
         <div className="mx-auto max-w-6xl px-4 py-3">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="grid h-12 w-12 place-items-center rounded-2xl border border-hennies-aqua/60 bg-white text-center text-[10px] font-black uppercase leading-none text-hennies-navy shadow-aqua">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-[1.1rem] border border-hennies-sky bg-hennies-cream text-center text-[11px] font-black uppercase leading-none text-hennies-navy shadow-aqua">
                 HDM
               </div>
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.25em] text-hennies-orange">
+              <div className="min-w-0">
+                <p className="truncate text-[11px] font-black uppercase tracking-[0.24em] text-hennies-orange">
                   {BRAND_PLACEHOLDER}
                 </p>
-                <h1 className="text-lg font-black leading-tight sm:text-2xl">
+                <h1 className="truncate text-lg font-black leading-tight sm:text-2xl">
                   {branch.name}
                 </h1>
               </div>
             </div>
-            <span className="rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-bold text-emerald-200">
-              Open today
+            <span className="shrink-0 rounded-full bg-hennies-green/20 px-3 py-2 text-xs font-black leading-tight text-hennies-cream ring-1 ring-hennies-green/30">
+              Open
+              <br /> today
             </span>
           </div>
-          <div className="mt-3 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-3 py-2">
-            <Search className="h-4 w-4 text-hennies-aqua" />
+          <div className="mt-3 flex items-center gap-2 rounded-[1.25rem] border border-white/10 bg-white/10 px-3 py-3 shadow-inner">
+            <Search className="h-5 w-5 text-hennies-sky" />
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search burgers, wings, drinks, pizzas…"
-              className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/55"
+              className="w-full bg-transparent text-[16px] font-semibold text-white outline-none placeholder:text-white/48"
             />
           </div>
         </div>
         <nav className="no-scrollbar flex gap-2 overflow-x-auto px-4 pb-3 md:justify-center">
-          <button
-            onClick={() => setActiveCategory("all")}
-            className={tabClass(activeCategory === "all")}
-          >
-            All
-          </button>
+          <CategoryTab
+            label="All"
+            active={activeCategory === "all"}
+            onClick={() => selectCategory("all")}
+          />
           {categories.map((category) => (
-            <button
+            <CategoryTab
               key={category.slug}
-              onClick={() => setActiveCategory(category.slug)}
-              className={tabClass(activeCategory === category.slug)}
-            >
-              {category.name}
-            </button>
+              label={category.name}
+              active={activeCategory === category.slug}
+              onClick={() => selectCategory(category.slug)}
+            />
           ))}
         </nav>
       </section>
 
-      <section className="relative mx-auto max-w-6xl px-4 pb-10 pt-5">
-        <div className="absolute inset-x-0 top-0 -z-0 h-72 bg-[radial-gradient(circle_at_top_left,rgba(25,211,209,.3),transparent_35%),radial-gradient(circle_at_top_right,rgba(255,122,26,.28),transparent_38%)]" />
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-hennies-blue shadow-2xl">
-          <img
-            src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1400&q=80"
-            alt="Sports bar food spread"
-            className="h-56 w-full object-cover opacity-70 sm:h-72"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-hennies-navy via-hennies-navy/45 to-transparent" />
-          <div className="absolute bottom-0 p-5 sm:p-8">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-hennies-orange px-3 py-1 text-xs font-black uppercase text-white">
-              <Flame className="h-4 w-4" /> No ordering. Just lekker browsing.
-            </div>
-            <h2 className="max-w-3xl text-4xl font-black leading-none sm:text-6xl">
-              Visual menu for food, drinks & branch specials.
-            </h2>
-            <p className="mt-3 max-w-xl text-sm text-white/80 sm:text-base">
-              Scan once per branch. Browse images, prices, allergens and
-              specials. Ask your waiter to order at the table.
-            </p>
-          </div>
-        </div>
+      <section
+        ref={menuStartRef}
+        className="relative mx-auto max-w-6xl scroll-mt-36 px-4 pb-10 pt-4"
+      >
+        <div className="absolute inset-x-0 top-0 -z-0 h-72 bg-[radial-gradient(circle_at_top_left,rgba(82,198,226,.18),transparent_38%),radial-gradient(circle_at_top_right,rgba(240,171,0,.16),transparent_40%)]" />
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <InfoCard
-            icon={<Clock className="h-5 w-5" />}
-            label="Trading hours"
-            value={branch.trading_hours}
-          />
-          <InfoCard
-            icon={<BadgeInfo className="h-5 w-5" />}
-            label="Branch"
-            value={branch.address}
-          />
-          <InfoCard
-            icon={<Sparkles className="h-5 w-5" />}
-            label="Service buttons"
-            value="Call waiter / bill request are optional future features"
-          />
-        </div>
+        {!isCategoryView && !normalized && (
+          <>
+            <HeroCard />
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <InfoCard
+                icon={<Clock className="h-5 w-5" />}
+                label="Trading hours"
+                value={branch.trading_hours}
+              />
+              <InfoCard
+                icon={<BadgeInfo className="h-5 w-5" />}
+                label="Branch"
+                value={branch.address}
+              />
+              <InfoCard
+                icon={<Sparkles className="h-5 w-5" />}
+                label="Service buttons"
+                value="Optional future feature — browse now, order with staff."
+              />
+            </div>
 
-        {specials.length > 0 && (
-          <Section
-            title="Specials & promotions"
-            subtitle="Branch-friendly promos without checkout clutter."
-          >
-            <div className="grid gap-4 sm:grid-cols-2">
-              {specials.map((special) => (
-                <article
-                  key={special.id}
-                  className="overflow-hidden rounded-3xl border border-hennies-orange/30 bg-hennies-orange/15"
-                >
-                  <img
-                    src={special.image_url}
-                    alt=""
-                    className="h-36 w-full object-cover"
-                    loading="lazy"
-                  />
-                  <div className="p-4">
-                    <p className="text-xs font-black uppercase tracking-[0.2em] text-hennies-orange">
-                      {special.is_global ? "Global special" : "Branch special"}
-                    </p>
-                    <h3 className="text-xl font-black">{special.title}</h3>
-                    <p className="mt-1 text-sm text-white/75">
-                      {special.description}
-                    </p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </Section>
+            {specials.length > 0 && (
+              <Section
+                title="Specials & promotions"
+                subtitle="Match-day energy, branch promos and lekker crowd favourites."
+              >
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {specials.map((special) => (
+                    <SpecialCard key={special.id} special={special} />
+                  ))}
+                </div>
+              </Section>
+            )}
+
+            {popular.length > 0 && (
+              <Section
+                title="Popular picks"
+                subtitle="Fan favourites for quick browsing."
+              >
+                <div className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2">
+                  {popular.map((item) => (
+                    <ItemCard
+                      key={item.id}
+                      item={item}
+                      onClick={() => setSelected(item)}
+                      compact
+                    />
+                  ))}
+                </div>
+              </Section>
+            )}
+          </>
         )}
-        {popular.length > 0 && (
-          <Section
-            title="Popular picks"
-            subtitle="Fan favourites for quick browsing."
-          >
-            <div className="no-scrollbar flex gap-4 overflow-x-auto pb-2">
-              {popular.map((item) => (
-                <ItemCard
-                  key={item.id}
-                  item={item}
-                  onClick={() => setSelected(item)}
-                  compact
-                />
-              ))}
-            </div>
-          </Section>
-        )}
+
         <Section
-          title="Full menu"
-          subtitle={`${filtered.length} items available for visual browsing.`}
+          title={
+            isCategoryView && activeCategoryMeta
+              ? activeCategoryMeta.name
+              : normalized
+                ? "Search results"
+                : "Full menu"
+          }
+          subtitle={
+            isCategoryView && activeCategoryMeta
+              ? activeCategoryMeta.description
+              : `${filtered.length} items available for visual browsing.`
+          }
+          tight={isCategoryView || Boolean(normalized)}
         >
+          {isCategoryView && activeCategoryMeta && (
+            <div className="mb-4 flex items-center justify-between rounded-2xl border border-white/10 bg-white/8 px-4 py-3">
+              <span className="text-xs font-black uppercase tracking-[0.22em] text-hennies-sky">
+                {filtered.length} items in this category
+              </span>
+              <button
+                onClick={() => selectCategory("all")}
+                className="rounded-full bg-hennies-orange px-3 py-2 text-xs font-black text-white"
+              >
+                Show all
+              </button>
+            </div>
+          )}
+
           {grouped.map(({ category, items: groupItems }) => (
             <div
               key={category.slug}
               id={category.slug}
-              className="scroll-mt-36 py-4"
+              className="scroll-mt-36 py-3 first:pt-0"
             >
-              <div className="mb-3 flex items-end justify-between gap-3">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.22em] text-hennies-aqua">
-                    {category.description}
-                  </p>
-                  <h3 className="text-2xl font-black">{category.name}</h3>
+              {!isCategoryView && (
+                <div className="mb-3 flex items-end justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[0.22em] text-hennies-sky">
+                      {category.description}
+                    </p>
+                    <h3 className="text-2xl font-black">{category.name}</h3>
+                  </div>
+                  <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold">
+                    {groupItems.length}
+                  </span>
                 </div>
-                <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold">
-                  {groupItems.length}
-                </span>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              )}
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {groupItems.map((item) => (
                   <ItemCard
                     key={item.id}
@@ -225,23 +275,16 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
               </div>
             </div>
           ))}
-          {filtered.length === 0 && (
-            <div className="rounded-3xl border border-dashed border-white/20 bg-white/5 p-8 text-center">
-              <h3 className="text-2xl font-black">No menu matches found</h3>
-              <p className="mt-2 text-white/70">
-                Try searching for wings, burgers, pizza, coffee or cocktails.
-              </p>
-            </div>
-          )}
+          {filtered.length === 0 && <EmptyState />}
         </Section>
       </section>
       <button
         onClick={() => scrollTo({ top: 0, behavior: "smooth" })}
-        className="fixed bottom-5 right-5 z-30 grid h-12 w-12 place-items-center rounded-full bg-hennies-orange shadow-orange"
+        className="fixed bottom-5 right-5 z-30 grid h-12 w-12 place-items-center rounded-full bg-hennies-orange text-white shadow-orange ring-4 ring-hennies-orange/15"
       >
         <ArrowUp className="h-5 w-5" />
       </button>
-      <footer className="border-t border-white/10 px-4 py-6 text-center text-xs font-bold uppercase tracking-[0.2em] text-white/60">
+      <footer className="border-t border-white/10 px-4 py-6 text-center text-xs font-black uppercase tracking-[0.2em] text-white/55">
         {POWERED_BY}
       </footer>
       {selected && (
@@ -250,49 +293,129 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
     </main>
   );
 }
-function tabClass(active: boolean) {
-  return `whitespace-nowrap rounded-full px-4 py-2 text-sm font-black transition ${active ? "bg-hennies-orange text-white shadow-orange" : "bg-white/10 text-white/75 hover:bg-white/15"}`;
+
+function HeroCard() {
+  return (
+    <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-hennies-navy shadow-2xl">
+      <img
+        src={HERO_IMAGE}
+        alt="Sports bar food spread"
+        className="h-[21rem] w-full object-cover opacity-75 sm:h-80"
+        fetchPriority="high"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-hennies-night via-hennies-night/45 to-transparent" />
+      <div className="absolute bottom-0 p-5 sm:p-8">
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-hennies-orange px-3 py-1.5 text-xs font-black uppercase text-white shadow-orange">
+          <Flame className="h-4 w-4" /> Hennie’s-style menu browsing
+        </div>
+        <h2 className="max-w-3xl text-4xl font-black leading-[0.94] sm:text-6xl">
+          Blêrrie lekker food, drinks & branch specials.
+        </h2>
+        <p className="mt-3 max-w-xl text-sm font-semibold text-white/82 sm:text-base">
+          Scan once per branch. Browse photos, prices, allergens and promos —
+          then order with your waiter.
+        </p>
+      </div>
+    </div>
+  );
 }
+
+function CategoryTab({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-black transition ${
+        active
+          ? "bg-hennies-orange text-white shadow-orange"
+          : "bg-white/10 text-white/78 hover:bg-white/15"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
 function InfoCard({
   icon,
   label,
   value,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
   value: string;
 }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/8 p-4">
-      <div className="flex items-center gap-2 text-hennies-aqua">
+    <div className="rounded-[1.5rem] border border-white/10 bg-white/7 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,.06)]">
+      <div className="flex items-center gap-2 text-hennies-sky">
         {icon}
         <span className="text-xs font-black uppercase tracking-[0.2em]">
           {label}
         </span>
       </div>
-      <p className="mt-2 text-sm font-semibold text-white/85">{value}</p>
+      <p className="mt-2 text-sm font-bold leading-relaxed text-white/86">
+        {value}
+      </p>
     </div>
   );
 }
+
 function Section({
   title,
   subtitle,
   children,
+  tight = false,
 }: {
   title: string;
   subtitle: string;
-  children: React.ReactNode;
+  children: ReactNode;
+  tight?: boolean;
 }) {
   return (
-    <section className="mt-8">
+    <section className={tight ? "mt-2" : "mt-8"}>
       <div className="mb-4">
-        <h2 className="text-3xl font-black">{title}</h2>
-        <p className="text-sm text-white/65">{subtitle}</p>
+        <h2 className="text-3xl font-black leading-tight sm:text-4xl">
+          {title}
+        </h2>
+        <p className="mt-1 text-sm font-semibold text-white/62">{subtitle}</p>
       </div>
       {children}
     </section>
   );
 }
+
+function SpecialCard({ special }: { special: Special }) {
+  return (
+    <article className="overflow-hidden rounded-[1.5rem] border border-hennies-orange/30 bg-hennies-charcoal shadow-[0_12px_30px_rgba(0,0,0,.25)]">
+      <img
+        src={compactImageUrl(special.image_url, 620, 55)}
+        alt=""
+        className="h-36 w-full object-cover sm:h-44"
+        loading="lazy"
+        decoding="async"
+      />
+      <div className="p-4">
+        <p className="text-[11px] font-black uppercase tracking-[0.24em] text-hennies-orange">
+          {special.is_global ? "Global special" : "Branch special"}
+        </p>
+        <h3 className="mt-1 text-xl font-black leading-tight text-white">
+          {special.title}
+        </h3>
+        <p className="mt-2 text-sm font-medium leading-relaxed text-white/72">
+          {special.description}
+        </p>
+      </div>
+    </article>
+  );
+}
+
 function ItemCard({
   item,
   onClick,
@@ -305,36 +428,45 @@ function ItemCard({
   return (
     <button
       onClick={onClick}
-      className={`group overflow-hidden rounded-3xl border border-white/10 bg-white text-left text-hennies-navy shadow-xl transition hover:-translate-y-1 hover:shadow-aqua ${compact ? "min-w-[260px]" : ""}`}
+      className={`group grid overflow-hidden rounded-[1.45rem] border border-white/12 bg-hennies-cream text-left text-hennies-navy shadow-[0_14px_30px_rgba(0,0,0,.28)] transition hover:-translate-y-1 hover:shadow-aqua ${
+        compact
+          ? "min-w-[78vw] snap-start sm:min-w-[320px]"
+          : "grid-cols-[128px_1fr] sm:grid-cols-1"
+      }`}
     >
-      <div className="relative">
+      <div className={`relative ${compact ? "" : "min-h-full sm:min-h-0"}`}>
         <img
-          src={item.image_url}
+          src={compactImageUrl(item.image_url, compact ? 520 : 460, 54)}
           alt={item.name}
           loading="lazy"
-          className="h-40 w-full object-cover transition duration-500 group-hover:scale-105"
-        />{" "}
-        <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+          decoding="async"
+          className={`h-full w-full object-cover transition duration-500 group-hover:scale-105 ${
+            compact ? "h-44" : "min-h-[164px] sm:h-44"
+          }`}
+        />
+        <div className="absolute left-2 top-2 flex flex-wrap gap-1.5">
           {item.is_popular && <Badge text="Popular" />}
           {item.is_new && <Badge text="New" />}
           {item.is_sold_out && <Badge text="Sold out" tone="dark" />}
         </div>
       </div>
-      <div className="p-4">
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="text-lg font-black leading-tight">{item.name}</h3>
-          <p className="rounded-full bg-hennies-orange px-3 py-1 text-sm font-black text-white">
+      <div className="flex min-h-full flex-col p-3.5 sm:p-4">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="min-w-0 text-lg font-black leading-[1.05] sm:text-xl">
+            {item.name}
+          </h3>
+          <p className="shrink-0 rounded-full bg-hennies-orange px-3 py-1.5 text-sm font-black text-white shadow-orange">
             R{item.base_price}
           </p>
         </div>
-        <p className="mt-2 line-clamp-2 text-sm text-slate-600">
+        <p className="mt-2 line-clamp-3 text-sm font-medium leading-relaxed text-slate-700 sm:line-clamp-2">
           {item.description}
         </p>
-        <div className="mt-3 flex flex-wrap gap-1">
-          {item.tags.slice(0, 3).map((tag) => (
+        <div className="mt-auto flex flex-wrap gap-1.5 pt-3">
+          {item.tags.slice(0, compact ? 2 : 3).map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-hennies-aqua/15 px-2 py-1 text-[11px] font-bold text-hennies-blue"
+              className="rounded-full bg-hennies-sky/18 px-2.5 py-1 text-[11px] font-black text-hennies-navy"
             >
               #{tag}
             </span>
@@ -344,6 +476,7 @@ function ItemCard({
     </button>
   );
 }
+
 function Badge({
   text,
   tone = "orange",
@@ -353,12 +486,13 @@ function Badge({
 }) {
   return (
     <span
-      className={`rounded-full px-2 py-1 text-[11px] font-black uppercase ${tone === "orange" ? "bg-hennies-orange text-white" : "bg-slate-950 text-white"}`}
+      className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${tone === "orange" ? "bg-hennies-orange text-white" : "bg-slate-950 text-white"}`}
     >
       {text}
     </span>
   );
 }
+
 function ItemModal({ item, onClose }: { item: MenuItem; onClose: () => void }) {
   return (
     <div
@@ -367,29 +501,32 @@ function ItemModal({ item, onClose }: { item: MenuItem; onClose: () => void }) {
     >
       <article
         onClick={(event) => event.stopPropagation()}
-        className="mx-auto max-h-[92vh] max-w-lg overflow-auto rounded-[2rem] bg-white text-hennies-navy shadow-2xl"
+        className="mx-auto max-h-[92vh] max-w-lg overflow-auto rounded-[1.75rem] bg-hennies-cream text-hennies-navy shadow-2xl"
       >
         <div className="relative">
           <img
-            src={item.image_url}
+            src={compactImageUrl(item.image_url, 760, 60)}
             alt={item.name}
             className="h-72 w-full object-cover"
+            decoding="async"
           />
           <button
             onClick={onClose}
-            className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/90"
+            className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-hennies-cream/95 shadow-xl"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
         <div className="p-5">
           <div className="flex items-start justify-between gap-3">
-            <h2 className="text-3xl font-black">{item.name}</h2>
+            <h2 className="text-3xl font-black leading-tight">{item.name}</h2>
             <p className="rounded-full bg-hennies-orange px-4 py-2 text-lg font-black text-white">
               R{item.base_price}
             </p>
           </div>
-          <p className="mt-3 text-slate-700">{item.description}</p>
+          <p className="mt-3 font-medium leading-relaxed text-slate-700">
+            {item.description}
+          </p>
           <div className="mt-4">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
               Tags
@@ -398,7 +535,7 @@ function ItemModal({ item, onClose }: { item: MenuItem; onClose: () => void }) {
               {item.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-hennies-aqua/15 px-3 py-1 text-xs font-bold"
+                  className="rounded-full bg-hennies-sky/18 px-3 py-1 text-xs font-black"
                 >
                   {tag}
                 </span>
@@ -409,18 +546,74 @@ function ItemModal({ item, onClose }: { item: MenuItem; onClose: () => void }) {
             <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
               Allergens
             </p>
-            <p className="mt-1 text-sm text-slate-700">
+            <p className="mt-1 text-sm font-medium text-slate-700">
               {item.allergens.length
                 ? item.allergens.join(", ")
                 : "Ask your waiter if you have dietary requirements."}
             </p>
           </div>
-          <div className="mt-5 rounded-2xl bg-slate-100 p-3 text-sm font-semibold text-slate-600">
-            Ordering is intentionally not available in this MVP. Please order
-            with your waiter.
+          <div className="mt-5 rounded-2xl bg-white p-3 text-sm font-bold text-slate-600 shadow-inner">
+            Menu browsing only — please order with your waiter.
           </div>
         </div>
       </article>
     </div>
   );
+}
+
+function EmptyState() {
+  return (
+    <div className="rounded-3xl border border-dashed border-white/20 bg-white/5 p-8 text-center">
+      <h3 className="text-2xl font-black">No menu matches found</h3>
+      <p className="mt-2 text-white/70">
+        Try searching for wings, burgers, pizza, coffee or cocktails.
+      </p>
+    </div>
+  );
+}
+
+function BrandedLoader({ branchName }: { branchName: string }) {
+  return (
+    <main className="grid min-h-screen place-items-center bg-hennies-night px-5 text-white">
+      <section className="w-full max-w-sm rounded-[2rem] border border-white/10 bg-hennies-navy p-6 text-center shadow-aqua">
+        <div className="mx-auto grid h-16 w-16 place-items-center rounded-[1.25rem] border border-hennies-sky bg-hennies-cream text-sm font-black text-hennies-navy">
+          HDM
+        </div>
+        <p className="mt-5 text-[11px] font-black uppercase tracking-[0.28em] text-hennies-orange">
+          Hennie’s Digital Menu
+        </p>
+        <h1 className="mt-2 text-3xl font-black leading-tight">{branchName}</h1>
+        <p className="mt-2 text-sm font-semibold text-white/62">
+          Loading lekker photos, prices and specials…
+        </p>
+        <div className="mt-6 grid gap-3">
+          <SkeletonLine className="h-10 rounded-2xl" />
+          <div className="grid grid-cols-3 gap-2">
+            <SkeletonLine className="h-12 rounded-2xl" />
+            <SkeletonLine className="h-12 rounded-2xl" />
+            <SkeletonLine className="h-12 rounded-2xl" />
+          </div>
+          <SkeletonLine className="h-36 rounded-[1.5rem]" />
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function SkeletonLine({ className }: { className?: string }) {
+  return <div className={`hennies-skeleton ${className || ""}`} />;
+}
+
+function compactImageUrl(url: string, width = 640, quality = 58) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname.includes("images.unsplash.com")) {
+      parsed.searchParams.set("auto", "format");
+      parsed.searchParams.set("fit", "crop");
+      parsed.searchParams.set("w", String(width));
+      parsed.searchParams.set("q", String(quality));
+      return parsed.toString();
+    }
+  } catch {}
+  return url;
 }
