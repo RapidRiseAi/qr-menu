@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { ArrowUp, Flame, Info, Search, X } from "lucide-react";
+import { ArrowUp, Flame, Info, Menu, Search, X } from "lucide-react";
 import { BRAND_PLACEHOLDER, POWERED_BY } from "@/lib/constants";
 import type {
   Branch,
@@ -341,6 +341,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
   const [selected, setSelected] = useState<MenuItem | null>(null);
   const [selectedSpecial, setSelectedSpecial] = useState<Special | null>(null);
   const [isBooting, setIsBooting] = useState(true);
+  const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(true);
   const menuStartRef = useRef<HTMLDivElement>(null);
   const normalized = query.trim().toLowerCase();
   const isCategoryView = activeCategory !== "all";
@@ -474,28 +475,51 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
       >
         <div className="absolute inset-x-0 top-0 -z-0 h-72 bg-[radial-gradient(circle_at_top_left,rgba(82,198,226,.18),transparent_38%),radial-gradient(circle_at_top_right,rgba(240,171,0,.16),transparent_40%)]" />
 
-        <aside className="hidden xl:block fixed left-6 top-36 z-20 w-56 rounded-[1.5rem] border border-white/10 bg-hennies-night/85 p-3 shadow-2xl backdrop-blur-xl 2xl:left-[calc((100vw-1500px)/2)]">
-          <p className="px-3 pb-2 text-[10px] font-black uppercase tracking-[0.24em] text-hennies-sky">
-            Quick menu
-          </p>
-          <div className="max-h-[60vh] overflow-auto pr-1">
-            <button
-              onClick={() => selectCategory("all")}
-              className={`mb-1 w-full rounded-2xl px-3 py-2 text-left text-xs font-black ${activeCategory === "all" ? "bg-hennies-orange text-white" : "text-white/70 hover:bg-white/10"}`}
-            >
-              Full menu
-            </button>
-            {categories.map((category) => (
+        {isQuickMenuOpen ? (
+          <aside className="fixed left-6 top-52 z-20 hidden w-52 rounded-[1.5rem] border border-white/10 bg-hennies-night/90 p-3 shadow-2xl backdrop-blur-xl xl:block">
+            <div className="mb-2 flex items-center justify-between gap-2 px-2">
+              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-hennies-sky">
+                Quick menu
+              </p>
               <button
-                key={category.slug}
-                onClick={() => selectCategory(category.slug)}
-                className={`mb-1 w-full rounded-2xl px-3 py-2 text-left text-xs font-black ${activeCategory === category.slug ? "bg-hennies-orange text-white" : "text-white/70 hover:bg-white/10"}`}
+                type="button"
+                onClick={() => setIsQuickMenuOpen(false)}
+                className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white/75 transition hover:bg-white/15 hover:text-white"
+                aria-label="Close quick menu"
               >
-                {category.name}
+                <X className="h-4 w-4" />
               </button>
-            ))}
-          </div>
-        </aside>
+            </div>
+            <div className="max-h-[calc(100vh-15rem)] overflow-auto pr-1">
+              <button
+                type="button"
+                onClick={() => selectCategory("all")}
+                className={`mb-1 w-full rounded-2xl px-3 py-2 text-left text-xs font-black ${activeCategory === "all" ? "bg-hennies-orange text-white shadow-orange" : "text-white/70 hover:bg-white/10"}`}
+              >
+                Full menu
+              </button>
+              {categories.map((category) => (
+                <button
+                  type="button"
+                  key={category.slug}
+                  onClick={() => selectCategory(category.slug)}
+                  className={`mb-1 w-full rounded-2xl px-3 py-2 text-left text-xs font-black ${activeCategory === category.slug ? "bg-hennies-orange text-white shadow-orange" : "text-white/70 hover:bg-white/10"}`}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
+          </aside>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setIsQuickMenuOpen(true)}
+            className="fixed left-6 top-52 z-20 hidden items-center gap-2 rounded-full border border-white/10 bg-hennies-night/90 px-4 py-3 text-xs font-black uppercase tracking-[0.18em] text-hennies-sky shadow-2xl backdrop-blur-xl transition hover:bg-hennies-blue xl:flex"
+            aria-label="Open quick menu"
+          >
+            <Menu className="h-4 w-4" /> Quick menu
+          </button>
+        )}
 
         {!isCategoryView && !normalized && (
           <>
