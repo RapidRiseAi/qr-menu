@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { ArrowUp, ChevronDown, Flame, Info, Menu, Search, X } from "lucide-react";
+import { ArrowUp, Flame, Info, Menu, Search, X } from "lucide-react";
 import { BRAND_PLACEHOLDER, POWERED_BY } from "@/lib/constants";
 import type {
   Branch,
@@ -473,9 +473,11 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
         ref={menuStartRef}
         className="relative mx-auto max-w-7xl scroll-mt-36 px-4 pb-10 pt-4"
       >
+        <div className="absolute inset-x-0 top-0 -z-0 h-72 bg-[radial-gradient(circle_at_top_left,rgba(82,198,226,.18),transparent_38%),radial-gradient(circle_at_top_right,rgba(240,171,0,.16),transparent_40%)]" />
+
         {isQuickMenuOpen ? (
-          <aside className="fixed bottom-24 left-5 top-44 z-20 hidden w-48 flex-col rounded-[1.5rem] border border-white/10 bg-hennies-night/92 p-3 shadow-2xl backdrop-blur-xl xl:flex 2xl:left-8">
-            <div className="mb-2 flex shrink-0 items-center justify-between gap-2 px-2">
+          <aside className="fixed left-6 top-52 z-20 hidden w-52 rounded-[1.5rem] border border-white/10 bg-hennies-night/90 p-3 shadow-2xl backdrop-blur-xl xl:block">
+            <div className="mb-2 flex items-center justify-between gap-2 px-2">
               <p className="text-[10px] font-black uppercase tracking-[0.24em] text-hennies-sky">
                 Quick menu
               </p>
@@ -488,7 +490,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="min-h-0 flex-1 overflow-auto pr-1">
+            <div className="max-h-[calc(100vh-15rem)] overflow-auto pr-1">
               <button
                 type="button"
                 onClick={() => selectCategory("all")}
@@ -512,7 +514,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
           <button
             type="button"
             onClick={() => setIsQuickMenuOpen(true)}
-            className="fixed left-5 top-44 z-20 hidden items-center gap-2 rounded-full border border-white/10 bg-hennies-night/92 px-4 py-3 text-xs font-black uppercase tracking-[0.18em] text-hennies-sky shadow-2xl backdrop-blur-xl transition hover:bg-hennies-blue xl:flex 2xl:left-8"
+            className="fixed left-6 top-52 z-20 hidden items-center gap-2 rounded-full border border-white/10 bg-hennies-night/90 px-4 py-3 text-xs font-black uppercase tracking-[0.18em] text-hennies-sky shadow-2xl backdrop-blur-xl transition hover:bg-hennies-blue xl:flex"
             aria-label="Open quick menu"
           >
             <Menu className="h-4 w-4" /> Quick menu
@@ -522,7 +524,6 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
         {!isCategoryView && !normalized && (
           <>
             <HeroCard />
-            <HouseRulesCard />
             {specials.length > 0 && (
               <Section
                 title="Specials & promotions"
@@ -692,95 +693,6 @@ function HeroCard() {
         </p>
       </div>
     </div>
-  );
-}
-
-function HouseRulesCard() {
-  const [isOpen, setIsOpen] = useState(true);
-  const rules = [
-    "Don’t be a d**s.",
-    "Always have fun.",
-    "Don’t let Rule #2 make you break Rule #1.",
-    "Always drink with your left hand — Buffalo rules apply.",
-    "Whistle if you need service.",
-    "Always respect the bark by barking along.",
-    "Don’t ring the bell unless you are buying a round.",
-    "Stand up and respect the National Anthem of South Africa.",
-    "Please tip your waiter or barman.",
-    "You may forget some of the rules, except Rule #1 and Rule #7.",
-  ];
-
-  return (
-    <section className="mt-5 overflow-hidden rounded-[1.9rem] border-[3px] border-hennies-orange bg-hennies-navy p-1.5 text-white shadow-2xl">
-      <button
-        type="button"
-        onClick={() => setIsOpen((open) => !open)}
-        className="flex w-full items-center justify-between gap-4 rounded-[1.45rem] bg-hennies-navy px-4 py-4 text-left sm:px-5"
-        aria-expanded={isOpen}
-      >
-        <div className="flex min-w-0 items-center gap-3">
-          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-[1.2rem] bg-hennies-sky text-xs font-black text-hennies-navy shadow-aqua">
-            HDM
-          </div>
-          <div className="min-w-0">
-            <p className="text-[10px] font-black uppercase tracking-[0.28em] text-hennies-orange">
-              Hennie’s menu
-            </p>
-            <h2 className="mt-1 text-3xl font-black leading-none sm:text-5xl">
-              House Rules
-            </h2>
-          </div>
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <span className="hidden rotate-[-3deg] rounded-2xl bg-white px-3 py-2 text-lg font-black uppercase text-hennies-navy shadow-[4px_4px_0_rgba(82,198,226,.45)] sm:inline-flex">
-            Rule #1
-          </span>
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-hennies-orange text-white shadow-orange">
-            <ChevronDown
-              className={`h-5 w-5 transition ${isOpen ? "rotate-180" : ""}`}
-            />
-          </span>
-        </div>
-      </button>
-
-      {isOpen && (
-        <div className="rounded-[1.5rem] border-2 border-white bg-hennies-sky text-hennies-navy">
-          <div className="flex items-center justify-between gap-3 border-b-2 border-white/80 px-5 py-3">
-            <p className="text-3xl font-black uppercase leading-none tracking-tight sm:text-4xl">
-              House Rules
-            </p>
-            <span className="rounded-xl bg-white px-3 py-1.5 text-xl font-black uppercase shadow-[3px_3px_0_rgba(0,47,95,.22)]">
-              #1
-            </span>
-          </div>
-          <div className="grid gap-4 p-5 lg:grid-cols-[1fr_310px] lg:p-6">
-            <ol className="grid gap-2 text-sm font-black leading-snug sm:grid-cols-2 sm:text-base lg:grid-cols-1">
-              {rules.map((rule, index) => (
-                <li key={rule} className="flex gap-3">
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white text-xs text-hennies-navy shadow-sm">
-                    {index + 1}
-                  </span>
-                  <span>{rule}</span>
-                </li>
-              ))}
-            </ol>
-            <div className="rounded-[1.5rem] border-2 border-hennies-navy/15 bg-white p-4 shadow-inner">
-              <p className="text-xs font-black uppercase tracking-[0.22em] text-hennies-orange">
-                Menu note
-              </p>
-              <p className="mt-2 text-lg font-black leading-tight">
-                Lekker food, cold drinks and good gees. Ask your waiter about
-                allergens before ordering.
-              </p>
-              <p className="mt-4 rounded-2xl bg-hennies-orange px-3 py-2 text-sm font-black text-white">
-                Collapse these rules any time if you want to get straight to
-                the menu.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-    </section>
   );
 }
 

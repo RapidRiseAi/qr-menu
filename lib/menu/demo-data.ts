@@ -991,248 +991,6 @@ const raw: Array<[string, string, number, string, string[], string[]?]> = [
     ["mocktail"],
     [],
   ],
-
-  [
-    "Easy Shareables",
-    "Mozzarella, Bacon, Jalapeño & Mayo Braaibroodjie",
-    96,
-    "Braai-style toasted broodjie with mozzarella, bacon, jalapeño and mayo.",
-    ["shareable", "braaibroodjie"],
-    ["gluten", "dairy", "egg"],
-  ],
-  [
-    "Easy Shareables",
-    "Mozzarella, Caramelized Onion, Biltong Powder & Cream Cheese Braaibroodjie",
-    109,
-    "Braaibroodjie wedges with mozzarella, caramelized onion, biltong powder and cream cheese.",
-    ["shareable", "braaibroodjie"],
-    ["gluten", "dairy"],
-  ],
-  [
-    "Brakke Brêkkies",
-    "Top-Up's / Build Your Own",
-    16,
-    "Build your breakfast with grilled onion, toast, egg, tomato, chips, cheddar, mushrooms, bacon, chicken livers or savoury mince.",
-    ["breakfast", "extras"],
-    ["gluten", "dairy", "egg"],
-  ],
-  [
-    "Starters",
-    "Focaccia - Plain with Garlic",
-    59,
-    "Plain focaccia brushed with garlic butter.",
-    ["starter", "vegetarian"],
-    ["gluten", "dairy"],
-  ],
-  [
-    "Starters",
-    "Feta and Garlic Focaccia",
-    69,
-    "Focaccia with feta and garlic butter.",
-    ["starter", "vegetarian"],
-    ["gluten", "dairy"],
-  ],
-
-  [
-    "Starters",
-    "4 Jalapeño Poppers",
-    109,
-    "Four jalapeño poppers stuffed with Danish feta, cheddar cheese and garlic, served with ranch sauce.",
-    ["starter", "spicy", "vegetarian"],
-    ["dairy", "gluten"],
-  ],
-  [
-    "Starters",
-    "8 Buffalo Wings",
-    99,
-    "Eight buffalo wings with blue cheese dip and your choice of sauce style.",
-    ["wings", "spicy", "popular"],
-    ["dairy"],
-  ],
-  [
-    "Kant Happies",
-    "Pap & Sheba",
-    29,
-    "South African pap with sheba sauce.",
-    ["side", "vegetarian"],
-    [],
-  ],
-  [
-    "Kant Happies",
-    "Tjippies",
-    26,
-    "A side portion of crispy tjippies.",
-    ["side", "chips", "fries", "vegetarian"],
-    [],
-  ],
-  [
-    "Kant Happies",
-    "1/2 Tjippies & 1/2 Onion Rings",
-    26,
-    "Half tjippies and half crispy onion rings.",
-    ["side", "chips", "fries", "vegetarian"],
-    ["gluten"],
-  ],
-  [
-    "Kant Happies",
-    "Butternut",
-    36,
-    "Comforting butternut side.",
-    ["side", "vegetarian"],
-    [],
-  ],
-  [
-    "Kant Happies",
-    "Cream Spinach",
-    36,
-    "Creamy spinach side.",
-    ["side", "vegetarian"],
-    ["dairy"],
-  ],
-  [
-    "Kant Happies",
-    "1/2 Butternut & 1/2 Cream Spinach",
-    36,
-    "Half butternut and half cream spinach.",
-    ["side", "vegetarian"],
-    ["dairy"],
-  ],
-  [
-    "Kant Happies",
-    "Groenslaai",
-    29,
-    "Small green salad side.",
-    ["side", "fresh", "vegetarian"],
-    [],
-  ],
-  [
-    "Kant Happies",
-    "Braaibroodjie",
-    36,
-    "Classic braaibroodjie side with toasted bread, tomato, onion and cheese.",
-    ["side", "braaibroodjie", "vegetarian"],
-    ["gluten", "dairy"],
-  ],
-  [
-    "Kant Happies",
-    "Classic Sauces",
-    29,
-    "Choose mushroom, pepper, cheese, cheesy jalapeño or sheba sauce.",
-    ["sauce", "side"],
-    ["dairy"],
-  ],
-  [
-    "Kant Happies",
-    "Classic Dips",
-    26,
-    "Ranch or blue cheese dip for wings, chips and starters.",
-    ["dip", "side"],
-    ["dairy"],
-  ],
-  [
-    "Kant Happies",
-    "Stevie Sauce",
-    40,
-    "Hennie’s-style vinegar sauce with garlic, bitters, chilli, salt, black pepper, origanum and lemon juice.",
-    ["sauce", "side", "spicy"],
-    [],
-  ],
-  [
-    "Salads",
-    "Griekse Braaislaai",
-    99,
-    "Lettuce, olives, red onion, cucumber, cherry tomatoes and Danish feta with Greek salad dressing.",
-    ["fresh", "vegetarian"],
-    ["dairy"],
-  ],
-  [
-    "Salads",
-    "Add Bacon / Rump Slivers",
-    36,
-    "Optional salad protein add-on: bacon or rump slivers.",
-    ["salad", "extra"],
-    [],
-  ],
-  [
-    "Wings & Ribbetjies",
-    "Add 4 Wings",
-    50,
-    "Add four extra wings to your wings or ribbetjies plate.",
-    ["wings", "extra"],
-    [],
-  ],
-  [
-    "Wings & Ribbetjies",
-    "Add Tjippies & Onion Rings",
-    26,
-    "Add tjippies and crispy onion rings to wings or ribbetjies.",
-    ["chips", "fries", "extra"],
-    ["gluten"],
-  ],
-  [
-    "Wings & Ribbetjies",
-    "Add 200g Ribbetjies",
-    89,
-    "Add 200g ribbetjies to your wings plate.",
-    ["ribs", "pork", "extra"],
-    [],
-  ],
-  [
-    "Burgers & Horrogs",
-    "Add Patty and Cheese",
-    40,
-    "Extra burger patty and cheese slice.",
-    ["burger", "extra"],
-    ["dairy"],
-  ],
-  [
-    "Burgers & Horrogs",
-    "Add Bietjie Tjippies",
-    16,
-    "Add a small portion of tjippies to your burger or horrog.",
-    ["chips", "fries", "extra"],
-    [],
-  ],
-  [
-    "Burgers & Horrogs",
-    "Load It Up",
-    46,
-    "Top your horrog with cheese sauce, crispy bacon and melted cheese.",
-    ["horrog", "extra"],
-    ["dairy"],
-  ],
-  [
-    "Loaded Meals",
-    "Loaded Fries - Lekka Portion",
-    100,
-    "Tjippies, bacon and jalapeños smothered in cheese sauce and topped with grilled cheese.",
-    ["loaded", "chips", "fries"],
-    ["dairy"],
-  ],
-  [
-    "Loaded Meals",
-    "Loaded Nachos",
-    139,
-    "Nachos layered with cheese sauce, grilled cheese, tomato and onion salsa, guacamole and sour cream with optional toppings.",
-    ["loaded", "nachos"],
-    ["dairy"],
-  ],
-  [
-    "Pizzas",
-    "Make it Calzone",
-    15,
-    "Fold any pizza into a calzone with extra mozzarella.",
-    ["pizza", "extra"],
-    ["gluten", "dairy"],
-  ],
-  [
-    "Pizzas",
-    "Pizza Extras Selection",
-    16,
-    "Add onions, pineapple, green pepper, biltong powder, chilli, garlic, olives, jalapeños, mushrooms, grilled chicken, mozzarella, Danish feta, ham, pulled pork, bacon or avo.",
-    ["pizza", "extras"],
-    ["dairy"],
-  ],
 ];
 
 export const menuItems: MenuItem[] = raw.map(
@@ -1293,133 +1051,47 @@ export function slugify(value: string) {
 }
 function imageFor(categorySlug: string, tags: string[], itemName: string) {
   const name = slugify(itemName);
-  const query = imageQueryFor(categorySlug, tags, name, itemName);
-  return menuPhotoUrl(query, itemName);
-}
-
-function imageQueryFor(
-  categorySlug: string,
-  tags: string[],
-  normalizedName: string,
-  itemName: string,
-) {
-  if (normalizedName.includes("strawberry-milkshake"))
-    return "strawberry milkshake";
-  if (normalizedName.includes("chocolate-milkshake"))
-    return "chocolate milkshake";
-  if (normalizedName.includes("vanilla-milkshake")) return "vanilla milkshake";
-  if (normalizedName.includes("bubblegum")) return "blue bubblegum milkshake";
-  if (normalizedName.includes("salted-caramel"))
-    return "caramel milkshake";
-  if (normalizedName.includes("nutella")) return "hazelnut chocolate shake";
-  if (normalizedName.includes("bloody-mary")) return "bloody mary cocktail";
-  if (normalizedName.includes("mojito")) return "mojito cocktail";
-  if (normalizedName.includes("daiquiri") || normalizedName.includes("inge"))
-    return "frozen fruit cocktail";
-  if (normalizedName.includes("sunset")) return "orange tropical cocktail";
-  if (normalizedName.includes("ginger-ninja")) return "ginger cocktail";
-  if (normalizedName.includes("colada")) return "pina colada cocktail";
-  if (normalizedName.includes("margarita")) return "strawberry margarita";
-  if (normalizedName.includes("virgin")) return "mocktail fruit drink";
-  if (normalizedName.includes("rock-shandy")) return "lemon soda drink";
-  if (normalizedName.includes("non-alcoholic-lager")) return "non alcoholic beer";
-  if (normalizedName.includes("castle") || normalizedName.includes("black-label"))
-    return "south african lager beer";
-  if (normalizedName.includes("stella")) return "lager beer glass";
-  if (normalizedName.includes("hunter") || normalizedName.includes("savanna"))
-    return "apple cider bottle";
-  if (normalizedName.includes("americano")) return "black coffee cup";
-  if (normalizedName.includes("cappuccino")) return "cappuccino cup";
-  if (normalizedName.includes("cafe-latte")) return "cafe latte";
-  if (normalizedName.includes("mochaccino")) return "mocha coffee";
-  if (normalizedName.includes("five-roses") || normalizedName.includes("rooibos"))
-    return "hot tea cup";
-  if (normalizedName.includes("water")) return "sparkling water bottle";
-  if (normalizedName.includes("red-bull")) return "energy drink can";
-  if (normalizedName.includes("appletiser")) return "sparkling apple drink";
-  if (normalizedName.includes("tomato-juice")) return "tomato juice glass";
-  if (normalizedName.includes("sir-fruit")) return "fruit juice bottle";
-  if (normalizedName.includes("ice-tea")) return "iced tea glass";
-  if (normalizedName.includes("soda")) return "soft drink cans";
-  if (normalizedName.includes("calzone")) return "calzone pizza";
-  if (normalizedName.includes("pepperoni")) return "pepperoni pizza";
-  if (normalizedName.includes("hawaiian")) return "hawaiian pizza";
-  if (normalizedName.includes("regina")) return "ham mushroom pizza";
-  if (normalizedName.includes("jalapeno-popper-pizza"))
-    return "jalapeno pizza";
-  if (normalizedName.includes("varkhond-pizza")) return "bbq pork pizza";
-  if (normalizedName.includes("horrog-heaven")) return "hot dog pizza";
-  if (categorySlug.includes("pizza")) return `${itemName} pizza`;
-  if (normalizedName.includes("cookie")) return "cookies and cream dessert";
-  if (normalizedName.includes("dom-pedro")) return "cream dessert cocktail";
-  if (normalizedName.includes("malva")) return "malva pudding custard";
-  if (normalizedName.includes("brownie")) return "chocolate brownie dessert";
-  if (normalizedName.includes("loaded-fries") || normalizedName.includes("tjippies"))
-    return "loaded fries";
-  if (normalizedName.includes("chips") || normalizedName.includes("fries"))
-    return "french fries";
-  if (normalizedName.includes("nachos")) return "loaded nachos";
-  if (normalizedName.includes("horrog") || normalizedName.includes("varkhond"))
-    return "loaded hot dog";
-  if (normalizedName.includes("burger")) return `${itemName} burger`;
-  if (normalizedName.includes("rib") || normalizedName.includes("ribbetjies"))
-    return "bbq pork ribs";
-  if (normalizedName.includes("buffalo") || normalizedName.includes("wings"))
-    return "buffalo chicken wings";
-  if (normalizedName.includes("calamari")) return "crispy calamari";
-  if (normalizedName.includes("mushroom")) return "crumbed mushrooms";
-  if (normalizedName.includes("mozzarella")) return "mozzarella bites";
-  if (normalizedName.includes("halloumi")) return "fried halloumi";
-  if (normalizedName.includes("jalapeno")) return "jalapeno poppers";
-  if (normalizedName.includes("focaccia")) return "garlic focaccia bread";
-  if (normalizedName.includes("braaibroodjie")) return "grilled cheese sandwich";
-  if (normalizedName.includes("omelette")) return "cheese omelette";
-  if (normalizedName.includes("brekkie") || normalizedName.includes("breakfast"))
-    return "fried breakfast eggs bacon";
-  if (normalizedName.includes("rump") || normalizedName.includes("steak"))
-    return "grilled steak plate";
-  if (normalizedName.includes("t-bone")) return "t bone steak";
-  if (normalizedName.includes("schnitzel")) return "chicken schnitzel";
-  if (normalizedName.includes("eisbein")) return "pork knuckle eisbein";
-  if (normalizedName.includes("bakkie")) return "loaded food basket";
-  if (normalizedName.includes("greek") || normalizedName.includes("griekse"))
-    return "greek salad feta";
-  if (normalizedName.includes("chicken-salad")) return "grilled chicken salad";
-  if (normalizedName.includes("halloumi-salad")) return "halloumi salad";
-  if (categorySlug.includes("salad")) return "fresh pub salad";
-  if (normalizedName.includes("pap")) return "pap tomato relish";
-  if (normalizedName.includes("butternut")) return "roasted butternut";
-  if (normalizedName.includes("spinach")) return "creamed spinach";
-  if (normalizedName.includes("onion-rings")) return "crispy onion rings";
-  if (normalizedName.includes("sauce") || normalizedName.includes("dips"))
-    return "dipping sauce bowls";
-  if (categorySlug.includes("cocktail") || categorySlug.includes("non-alcoholic"))
-    return "bar drinks cocktails";
-  if (categorySlug.includes("beer")) return "beer cider bottles";
-  if (categorySlug.includes("cold")) return "cold soft drink glass";
-  if (categorySlug.includes("hot-drinks")) return "coffee cup";
-  if (categorySlug.includes("sweet")) return "restaurant dessert";
-  if (categorySlug.includes("vleis")) return "grilled meat plate";
-  if (tags.includes("shareable")) return "pub platter sharing food";
-  return `${itemName} restaurant food`;
-}
-
-function menuPhotoUrl(query: string, itemName: string) {
-  const cleanedQuery = query
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ",")
-    .replace(/^,+|,+$/g, "") || "restaurant,food";
-  return `https://loremflickr.com/900/650/${cleanedQuery}?lock=${stableImageLock(
-    itemName,
-  )}`;
-}
-
-function stableImageLock(value: string) {
-  let hash = 0;
-  for (const char of value) {
-    hash = (hash * 31 + char.charCodeAt(0)) % 100000;
-  }
-  return hash + 1000;
+  if (name.includes("chips") || name.includes("fries")) return imageMap.fries;
+  if (name.includes("nachos")) return imageMap.nachos;
+  if (name.includes("horrog") || name.includes("varkhond"))
+    return imageMap.hotdog;
+  if (name.includes("rib") || name.includes("ribbetjies")) return imageMap.ribs;
+  if (name.includes("calamari")) return imageMap.calamari;
+  if (name.includes("mushroom")) return imageMap.mushrooms;
+  if (name.includes("mozzarella") || name.includes("halloumi"))
+    return imageMap.mozzarella;
+  if (name.includes("omelette") || name.includes("egg"))
+    return imageMap.omelette;
+  if (name.includes("tea") || name.includes("rooibos")) return imageMap.tea;
+  if (
+    name.includes("soda") ||
+    name.includes("red-bull") ||
+    name.includes("appletiser")
+  )
+    return imageMap.soda;
+  if (name.includes("water")) return imageMap.water;
+  if (name.includes("milkshake") || categorySlug.includes("milkshakes"))
+    return imageMap.milkshake;
+  if (name.includes("dom-pedro")) return imageMap.dessertDrink;
+  if (name.includes("savanna") || name.includes("hunter"))
+    return imageMap.cider;
+  if (categorySlug.includes("pizza")) return imageMap.pizza;
+  if (categorySlug.includes("burger")) return imageMap.burger;
+  if (categorySlug.includes("wing")) return imageMap.wings;
+  if (categorySlug.includes("vleis")) return imageMap.steak;
+  if (categorySlug.includes("salad")) return imageMap.salad;
+  if (categorySlug.includes("sweet")) return imageMap.dessert;
+  if (categorySlug.includes("hot-drinks")) return imageMap.coffee;
+  if (categorySlug.includes("cold")) return imageMap.drink;
+  if (categorySlug.includes("beer")) return imageMap.beer;
+  if (
+    categorySlug.includes("cocktail") ||
+    categorySlug.includes("non-alcoholic")
+  )
+    return imageMap.cocktail;
+  if (categorySlug.includes("brekk")) return imageMap.breakfast;
+  if (tags.includes("shareable")) return imageMap.share;
+  return imageMap.starter;
 }
 
 export function getBranchBySlug(slug: string): Branch | undefined {
