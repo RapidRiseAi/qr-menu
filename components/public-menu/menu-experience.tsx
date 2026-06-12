@@ -1,7 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { ArrowUp, Flame, Info, Menu, Search, X } from "lucide-react";
+import {
+  ArrowUp,
+  ChevronDown,
+  Flame,
+  Info,
+  Menu,
+  ScrollText,
+  Search,
+  X,
+} from "lucide-react";
 import { BRAND_PLACEHOLDER, POWERED_BY } from "@/lib/constants";
 import type {
   Branch,
@@ -448,7 +457,8 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search burgers, chips, braaibroodjie, cocktails…"
-              className="w-full bg-transparent text-[16px] font-semibold text-white outline-none placeholder:text-white/48"
+              aria-label="Search the menu"
+              className="w-full bg-transparent text-[16px] font-semibold text-white outline-none placeholder:text-white/60"
             />
           </div>
         </div>
@@ -471,30 +481,39 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
 
       <section
         ref={menuStartRef}
-        className="relative mx-auto max-w-7xl scroll-mt-36 px-4 pb-10 pt-4"
+        className={`relative mx-auto max-w-7xl scroll-mt-36 px-4 pb-10 pt-4 transition-[padding] duration-300 ${
+          isQuickMenuOpen ? "xl:pl-[15.5rem]" : ""
+        }`}
       >
-        <div className="absolute inset-x-0 top-0 -z-0 h-72 bg-[radial-gradient(circle_at_top_left,rgba(82,198,226,.18),transparent_38%),radial-gradient(circle_at_top_right,rgba(240,171,0,.16),transparent_40%)]" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 -top-6 -z-10 h-64 bg-[radial-gradient(46%_70%_at_34%_0%,rgba(82,198,226,.13),transparent_72%),radial-gradient(46%_70%_at_66%_0%,rgba(240,171,0,.11),transparent_72%)]"
+        />
 
         {isQuickMenuOpen ? (
-          <aside className="fixed left-6 top-52 z-20 hidden w-52 rounded-[1.5rem] border border-white/10 bg-hennies-night/90 p-3 shadow-2xl backdrop-blur-xl xl:block">
-            <div className="mb-2 flex items-center justify-between gap-2 px-2">
+          <aside className="fixed left-6 top-44 z-20 hidden max-h-[calc(100vh-12rem)] w-52 flex-col rounded-[1.5rem] border border-white/10 bg-hennies-night/90 p-3 shadow-2xl backdrop-blur-xl xl:flex">
+            <div className="mb-2 flex shrink-0 items-center justify-between gap-2 px-2">
               <p className="text-[10px] font-black uppercase tracking-[0.24em] text-hennies-sky">
                 Quick menu
               </p>
               <button
                 type="button"
                 onClick={() => setIsQuickMenuOpen(false)}
-                className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white/75 transition hover:bg-white/15 hover:text-white"
+                className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white/75 transition hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky"
                 aria-label="Close quick menu"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="max-h-[calc(100vh-15rem)] overflow-auto pr-1">
+            <nav
+              aria-label="Quick category navigation"
+              className="no-scrollbar min-h-0 flex-1 overflow-y-auto pr-1"
+            >
               <button
                 type="button"
                 onClick={() => selectCategory("all")}
-                className={`mb-1 w-full rounded-2xl px-3 py-2 text-left text-xs font-black ${activeCategory === "all" ? "bg-hennies-orange text-white shadow-orange" : "text-white/70 hover:bg-white/10"}`}
+                aria-current={activeCategory === "all"}
+                className={`mb-0.5 w-full rounded-xl px-3 py-1.5 text-left text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky ${activeCategory === "all" ? "bg-hennies-orange text-white shadow-orange" : "text-white/70 hover:bg-white/10"}`}
               >
                 Full menu
               </button>
@@ -503,18 +522,19 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
                   type="button"
                   key={category.slug}
                   onClick={() => selectCategory(category.slug)}
-                  className={`mb-1 w-full rounded-2xl px-3 py-2 text-left text-xs font-black ${activeCategory === category.slug ? "bg-hennies-orange text-white shadow-orange" : "text-white/70 hover:bg-white/10"}`}
+                  aria-current={activeCategory === category.slug}
+                  className={`mb-0.5 w-full rounded-xl px-3 py-1.5 text-left text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky ${activeCategory === category.slug ? "bg-hennies-orange text-white shadow-orange" : "text-white/70 hover:bg-white/10"}`}
                 >
                   {category.name}
                 </button>
               ))}
-            </div>
+            </nav>
           </aside>
         ) : (
           <button
             type="button"
             onClick={() => setIsQuickMenuOpen(true)}
-            className="fixed left-6 top-52 z-20 hidden items-center gap-2 rounded-full border border-white/10 bg-hennies-night/90 px-4 py-3 text-xs font-black uppercase tracking-[0.18em] text-hennies-sky shadow-2xl backdrop-blur-xl transition hover:bg-hennies-blue xl:flex"
+            className="fixed left-6 top-44 z-20 hidden items-center gap-2 rounded-full border border-white/10 bg-hennies-night/90 px-4 py-3 text-xs font-black uppercase tracking-[0.18em] text-hennies-sky shadow-2xl backdrop-blur-xl transition hover:bg-hennies-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky xl:flex"
             aria-label="Open quick menu"
           >
             <Menu className="h-4 w-4" /> Quick menu
@@ -652,7 +672,12 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
       >
         <ArrowUp className="h-5 w-5" />
       </button>
-      <footer className="border-t border-white/10 px-4 py-6 text-center text-xs font-black uppercase tracking-[0.2em] text-white/55">
+      <HouseRules shifted={isQuickMenuOpen} />
+      <footer
+        className={`border-t border-white/10 px-4 py-6 text-center text-xs font-black uppercase tracking-[0.2em] text-white/55 transition-[padding] duration-300 ${
+          isQuickMenuOpen ? "xl:pl-[15.5rem]" : ""
+        }`}
+      >
         {POWERED_BY}
       </footer>
       {selected && (
@@ -708,7 +733,8 @@ function CategoryTab({
   return (
     <button
       onClick={onClick}
-      className={`whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-black transition ${
+      aria-current={active}
+      className={`whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky ${
         active
           ? "bg-hennies-orange text-white shadow-orange"
           : "bg-white/10 text-white/78 hover:bg-white/15"
@@ -806,7 +832,7 @@ function ItemCard({
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") onClick();
       }}
-      className={`group grid cursor-pointer overflow-hidden rounded-[1.35rem] border border-hennies-sky/20 bg-[linear-gradient(180deg,#f2e9df,#fff7ed)] text-left text-hennies-navy shadow-[0_16px_36px_rgba(0,0,0,.32)] ring-1 ring-white/10 transition hover:-translate-y-1 hover:border-hennies-orange/55 hover:shadow-orange ${
+      className={`group grid cursor-pointer overflow-hidden rounded-[1.35rem] border border-hennies-sky/20 bg-[linear-gradient(180deg,#f2e9df,#fff7ed)] text-left text-hennies-navy shadow-[0_16px_36px_rgba(0,0,0,.32)] ring-1 ring-white/10 transition hover:-translate-y-1 hover:border-hennies-orange/55 hover:shadow-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-orange focus-visible:ring-offset-2 focus-visible:ring-offset-hennies-night ${
         compact
           ? "min-w-[78vw] snap-start sm:min-w-[320px]"
           : "grid-cols-[132px_1fr] sm:grid-cols-1"
@@ -825,6 +851,10 @@ function ItemCard({
         />
         <div className="absolute left-2 top-2 flex flex-wrap gap-1.5">
           {item.is_popular && <Badge text="Popular" />}
+          {item.tags.includes("vegetarian") && <Badge text="Veg" tone="green" />}
+          {(item.tags.includes("spicy") || Boolean(item.spice_level)) && (
+            <Badge text="Spicy" tone="red" />
+          )}
           {item.is_new && <Badge text="New" />}
           {item.is_sold_out && <Badge text="Sold out" tone="dark" />}
         </div>
@@ -933,11 +963,17 @@ function Badge({
   tone = "orange",
 }: {
   text: string;
-  tone?: "orange" | "dark";
+  tone?: "orange" | "dark" | "green" | "red";
 }) {
+  const toneClass = {
+    orange: "bg-hennies-orange text-white",
+    dark: "bg-slate-950 text-white",
+    green: "bg-hennies-green text-slate-950",
+    red: "bg-red-600 text-white",
+  }[tone];
   return (
     <span
-      className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${tone === "orange" ? "bg-hennies-orange text-white" : "bg-slate-950 text-white"}`}
+      className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide shadow-sm ${toneClass}`}
     >
       {text}
     </span>
@@ -1079,6 +1115,106 @@ function SpecialModal({
         </div>
       </article>
     </div>
+  );
+}
+
+const HOUSE_RULES: ReactNode[] = [
+  <>Don’t be a d**s.</>,
+  <>
+    <strong>Always</strong> have fun.
+  </>,
+  <>
+    Don’t let Rule <strong>#2</strong> make you break Rule <strong>#1</strong>.
+  </>,
+  <>
+    Always drink with your left hand{" "}
+    <strong>(Buffalo rules apply).</strong> If you are caught drinking with your
+    right hand, you will be asked to down your drink.
+  </>,
+  <>
+    <strong>Whistle</strong> if you need service.
+  </>,
+  <>Always respect the bark by barking along.</>,
+  <>
+    <strong>Don’t ring the bell!</strong> If you ring the bell, you have to buy
+    the whole Hennie’s a round! If you do not, you will be asked to leave.
+  </>,
+  <>
+    <strong>Always stand up &amp; respect</strong> the National Anthem of South
+    Africa.
+  </>,
+  <>
+    <strong>Please tip your waiter</strong> or barman (refer to Rule{" "}
+    <strong>#1</strong>).
+  </>,
+  <>
+    You may forget some of the rules, except Rule <strong>#1</strong> and Rule{" "}
+    <strong>#7</strong>… <strong>don’t ring the bell!</strong>
+  </>,
+];
+
+function HouseRules({ shifted }: { shifted: boolean }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <section
+      className={`mx-auto mt-8 max-w-7xl px-4 transition-[padding] duration-300 ${
+        shifted ? "xl:pl-[15.5rem]" : ""
+      }`}
+    >
+      <div className="overflow-hidden rounded-[1.5rem] border border-hennies-sky/30 bg-[linear-gradient(160deg,#0a4072,#002f5f_55%,#06243f)] shadow-[0_18px_50px_rgba(0,0,0,.35)]">
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          aria-expanded={open}
+          aria-controls="house-rules-panel"
+          className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-hennies-sky"
+        >
+          <span className="flex items-center gap-3">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-hennies-orange text-white shadow-orange">
+              <ScrollText className="h-5 w-5" />
+            </span>
+            <span className="block">
+              <span className="block text-[10px] font-black uppercase tracking-[0.28em] text-hennies-sky">
+                House Rules
+              </span>
+              <span className="block text-2xl font-black leading-none text-hennies-cream sm:text-3xl">
+                The Hennie’s Rules
+              </span>
+            </span>
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="hidden rounded-full bg-hennies-orange px-3 py-1.5 text-xs font-black uppercase text-white shadow-orange sm:inline-flex">
+              Rule #1
+            </span>
+            <ChevronDown
+              className={`h-6 w-6 text-hennies-sky transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+            />
+          </span>
+        </button>
+        {open && (
+          <div
+            id="house-rules-panel"
+            className="border-t border-white/10 px-5 pb-5 pt-4"
+          >
+            <ol className="grid gap-2.5">
+              {HOUSE_RULES.map((rule, index) => (
+                <li key={index} className="flex gap-3">
+                  <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-hennies-orange/90 text-[12px] font-black text-white">
+                    {index + 1}
+                  </span>
+                  <p className="text-sm font-semibold leading-relaxed text-white/85 [&_strong]:font-black [&_strong]:text-hennies-gold">
+                    {rule}
+                  </p>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-5 border-t border-white/10 pt-4 text-center text-[11px] font-black uppercase tracking-[0.18em] text-white/55">
+              © Copyright. All rights reserved. Rikus de Beer 2018
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
