@@ -75,59 +75,147 @@ export const categories: MenuCategory[] = [
   is_active: true,
 }));
 
-const imageMap: Record<string, string> = {
-  share:
-    "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
-  breakfast:
-    "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=900&q=80",
-  starter:
-    "https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?auto=format&fit=crop&w=900&q=80",
-  steak:
-    "https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=900&q=80",
-  salad:
-    "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=80",
-  wings:
-    "https://images.unsplash.com/photo-1527477396000-e27163b481c2?auto=format&fit=crop&w=900&q=80",
-  burger:
-    "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80",
-  pizza:
-    "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80",
-  dessert:
-    "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=900&q=80",
-  coffee:
-    "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=900&q=80",
-  drink:
-    "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
-  beer: "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=900&q=80",
-  cocktail:
-    "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=900&q=80",
-  fries:
-    "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?auto=format&fit=crop&w=900&q=80",
-  nachos:
-    "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=900&q=80",
-  hotdog:
-    "https://images.unsplash.com/photo-1612392062631-94dd858cba88?auto=format&fit=crop&w=900&q=80",
-  ribs: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
-  calamari:
-    "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=900&q=80",
-  mushrooms:
-    "https://images.unsplash.com/photo-1504545102780-26774c1bb073?auto=format&fit=crop&w=900&q=80",
-  mozzarella:
-    "https://images.unsplash.com/photo-1541014741259-de529411b96a?auto=format&fit=crop&w=900&q=80",
-  omelette:
-    "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=900&q=80",
-  tea: "https://images.unsplash.com/photo-1547825407-2d060104b7f8?auto=format&fit=crop&w=900&q=80",
-  soda: "https://images.unsplash.com/photo-1580391947416-62d0d0a2cf5d?auto=format&fit=crop&w=900&q=80",
-  milkshake:
-    "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=900&q=80",
-  water:
-    "https://images.unsplash.com/photo-1564419320461-6870880221ad?auto=format&fit=crop&w=900&q=80",
-  cider:
-    "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?auto=format&fit=crop&w=900&q=80",
-  dessertDrink:
-    "https://images.unsplash.com/photo-1570197788417-0e82375c9371?auto=format&fit=crop&w=900&q=80",
-};
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80";
 
+// Per-item imagery: every menu item gets its own relevant, hand-checked photo.
+const itemImages: Record<string, string> = {
+  // Easy Shareables
+  "Bessie se Braaibroodjie Bord": "https://images.unsplash.com/photo-1528736235302-52922df5c122?auto=format&fit=crop&w=900&q=80",
+  "Brakke Platter": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=80",
+  "Hennie se Platter": "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&w=900&q=80",
+  "Jopie se Platter": "https://images.unsplash.com/photo-1606756790138-261d2b21cd75?auto=format&fit=crop&w=900&q=80",
+  "Barry se Platter": "https://images.unsplash.com/photo-1601912262364-3a35aa0d9399?auto=format&fit=crop&w=900&q=80",
+  "Jorrie se Platter": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=900&q=80",
+  // Brakke Brêkkies
+  "Budget Brêkkie": "https://images.unsplash.com/photo-1541329351076-600b0f9fdf28?auto=format&fit=crop&w=900&q=80",
+  "Reune Brêkkie": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=900&q=80",
+  "2 Egg Omelette": "https://images.unsplash.com/photo-1668283653825-37b80f055b05?auto=format&fit=crop&w=900&q=80",
+  "The Cheesy Brêkkie": "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=900&q=80",
+  "Boerie Breakfast Roll": "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?auto=format&fit=crop&w=900&q=80",
+  // Top 10
+  "Creamy Chicken Livers": "https://images.unsplash.com/photo-1628294896516-344152572ee8?auto=format&fit=crop&w=900&q=80",
+  "Crumbed Mushrooms": "https://images.unsplash.com/photo-1504545102780-26774c1bb073?auto=format&fit=crop&w=900&q=80",
+  "Crumbed Mozzarella Balls": "https://images.unsplash.com/photo-1548340748-6d2b7d7da280?auto=format&fit=crop&w=900&q=80",
+  "Barry se Balle": "https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=900&q=80",
+  "Halloumi Fingers": "https://images.unsplash.com/photo-1689151132093-e76db98a9d89?auto=format&fit=crop&w=900&q=80",
+  "Varkhondjie": "https://images.unsplash.com/photo-1612392062631-94dd858cba88?auto=format&fit=crop&w=900&q=80",
+  "Buffalo Wings": "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?auto=format&fit=crop&w=900&q=80",
+  "Jalapeño Poppers": "https://images.unsplash.com/photo-1561438883-3b98f4f6393d?auto=format&fit=crop&w=900&q=80",
+  // Lazy Focaccia
+  "Garlic & Herb Focaccia": "https://images.unsplash.com/photo-1619452357216-e88ca8119eeb?auto=format&fit=crop&w=900&q=80",
+  "Cheesy Bacon Focaccia": "https://images.unsplash.com/photo-1593629718888-9009c55e6cad?auto=format&fit=crop&w=900&q=80",
+  "Biltong & Feta Focaccia": "https://images.unsplash.com/photo-1605466237823-49122fcaf198?auto=format&fit=crop&w=900&q=80",
+  "Chilli Cheese Focaccia": "https://images.unsplash.com/photo-1609501677229-6de2950fc6e7?auto=format&fit=crop&w=900&q=80",
+  // Starters
+  "Crispy Calamari Strips": "https://images.unsplash.com/photo-1559737558-2f5a35f4523b?auto=format&fit=crop&w=900&q=80",
+  "Loaded Potato Skins": "https://images.unsplash.com/photo-1595955545772-0d06367c140d?auto=format&fit=crop&w=900&q=80",
+  "Nacho Cheese Poppers": "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=900&q=80",
+  "Sticky Rib Bites": "https://images.unsplash.com/photo-1528607929212-2636ec44253e?auto=format&fit=crop&w=900&q=80",
+  "Chicken Strippies": "https://images.unsplash.com/photo-1626082896492-766af4eb6501?auto=format&fit=crop&w=900&q=80",
+  // Vleis Vreters
+  "Rump 200g": "https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=900&q=80",
+  "Rump 300g": "https://images.unsplash.com/photo-1588168333986-5078d3ae3976?auto=format&fit=crop&w=900&q=80",
+  "T-Bone 500g": "https://images.unsplash.com/photo-1546964124-0cce460f38ef?auto=format&fit=crop&w=900&q=80",
+  "Stevie Steak 500g": "https://images.unsplash.com/photo-1594041680534-e8c8cdebd659?auto=format&fit=crop&w=900&q=80",
+  "Chicken Schnitzel": "https://images.unsplash.com/photo-1585325701956-60dd9c8553bc?auto=format&fit=crop&w=900&q=80",
+  "Chicken Stack": "https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?auto=format&fit=crop&w=900&q=80",
+  "Groot Vark Eisbein": "https://images.unsplash.com/photo-1613746192032-bee1894c743e?auto=format&fit=crop&w=900&q=80",
+  // Kant Happies
+  "Slap Chips": "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?auto=format&fit=crop&w=900&q=80",
+  "Onion Rings": "https://images.unsplash.com/photo-1625938146369-adc83368bda7?auto=format&fit=crop&w=900&q=80",
+  "Cheesy Garlic Roll": "https://images.unsplash.com/photo-1619535860434-ba1d8fa12536?auto=format&fit=crop&w=900&q=80",
+  "Creamy Mushroom Sauce": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=900&q=80",
+  // Salads
+  "Greek Salad": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=80",
+  "Chicken Salad": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=80",
+  "Avo & Halloumi Salad": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+  "Biltong Blue Cheese Salad": "https://images.unsplash.com/photo-1551248429-40975aa4de74?auto=format&fit=crop&w=900&q=80",
+  // Brakkie Bakkies
+  "Kippie Bakkie": "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?auto=format&fit=crop&w=900&q=80",
+  "Varkhond Bakkie": "https://images.unsplash.com/photo-1639744210631-209fce3e256c?auto=format&fit=crop&w=900&q=80",
+  "Strippies & Ribbetjies": "https://images.unsplash.com/photo-1619019187211-adf2f6119afd?auto=format&fit=crop&w=900&q=80",
+  "Brandsiek Bakkie": "https://images.unsplash.com/photo-1689151128603-4828c1c2838f?auto=format&fit=crop&w=900&q=80",
+  // Wings & Ribbetjies
+  "330g Buffalo Wings": "https://images.unsplash.com/photo-1608039755401-742074f0548d?auto=format&fit=crop&w=900&q=80",
+  "400g Ribbetjies": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
+  "Wings & Chips": "https://images.unsplash.com/photo-1631897788978-da06ec45adcb?auto=format&fit=crop&w=900&q=80",
+  "Ribs & Wings Combo": "https://images.unsplash.com/photo-1524114664604-cd8133cd67ad?auto=format&fit=crop&w=900&q=80",
+  // Burgers & Horrogs
+  "Hennie’s Basic Burgertjie": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80",
+  "Pulled Pork Burgertjie": "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=900&q=80",
+  "Classic Hennies Burger": "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?auto=format&fit=crop&w=900&q=80",
+  "Crumbed Chicken Burger": "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?auto=format&fit=crop&w=900&q=80",
+  "Double Cheese Biltong Burger": "https://images.unsplash.com/photo-1571091718767-18b5b1457add?auto=format&fit=crop&w=900&q=80",
+  "Cheese Louise": "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=900&q=80",
+  "Slidertjies": "https://images.unsplash.com/photo-1428660386617-8d277e7deaf2?auto=format&fit=crop&w=900&q=80",
+  "Hennie’s Horrog": "https://images.unsplash.com/photo-1610440042657-612c34d95e9f?auto=format&fit=crop&w=900&q=80",
+  // Loaded Meals
+  "Loaded Fries": "https://images.unsplash.com/photo-1582169296194-e4d644c48063?auto=format&fit=crop&w=900&q=80",
+  "Nachos Plain": "https://images.unsplash.com/photo-1571328003963-9742129e3951?auto=format&fit=crop&w=900&q=80",
+  "Chicken Loaded Nachos": "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?auto=format&fit=crop&w=900&q=80",
+  "Pulled Pork Loaded Fries": "https://images.unsplash.com/photo-1630431341973-02e1b662ec35?auto=format&fit=crop&w=900&q=80",
+  // Sweet Treats
+  "Cookies & Cream": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=900&q=80",
+  "Dom Pedro": "https://images.unsplash.com/photo-1436491911682-72ab1d398f59?auto=format&fit=crop&w=900&q=80",
+  "Malva Pudding": "https://images.unsplash.com/photo-1545768269-183cec1902b4?auto=format&fit=crop&w=900&q=80",
+  "Chocolate Brownie": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=900&q=80",
+  // Pizzas
+  "Margareets Pizza": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=900&q=80",
+  "Hawaiian Pizza": "https://images.unsplash.com/photo-1597715469889-dd75fe4a1765?auto=format&fit=crop&w=900&q=80",
+  "Regina Pizza": "https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?auto=format&fit=crop&w=900&q=80",
+  "Sweet Chilli Chicken Pizza": "https://images.unsplash.com/photo-1571066811602-716837d681de?auto=format&fit=crop&w=900&q=80",
+  "Pepperoni Pizza": "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&w=900&q=80",
+  "Jalapeño Popper Pizza": "https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=900&q=80",
+  "Varkhond Pizza": "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&w=900&q=80",
+  "Inge’s Pizza": "https://images.unsplash.com/photo-1601924582970-9238bcb495d9?auto=format&fit=crop&w=900&q=80",
+  "Horrog Heaven Pizza": "https://images.unsplash.com/photo-1548369937-47519962c11a?auto=format&fit=crop&w=900&q=80",
+  // Hot Drinks
+  "Americano": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=900&q=80",
+  "Cappuccino": "https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=900&q=80",
+  "Café Latte": "https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=900&q=80",
+  "Mochaccino": "https://images.unsplash.com/photo-1592663527359-cf6642f54cff?auto=format&fit=crop&w=900&q=80",
+  "Five Roses Tea": "https://images.unsplash.com/photo-1547825407-2d060104b7f8?auto=format&fit=crop&w=900&q=80",
+  "Rooibos Tea": "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?auto=format&fit=crop&w=900&q=80",
+  // Cold Drinks
+  "Various Sodas": "https://images.unsplash.com/photo-1581636625402-29b2a704ef13?auto=format&fit=crop&w=900&q=80",
+  "Sir Fruit": "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=900&q=80",
+  "Ice Tea": "https://images.unsplash.com/photo-1499638673689-79a0b5115d87?auto=format&fit=crop&w=900&q=80",
+  "Tomato Juice": "https://images.unsplash.com/photo-1601627901831-2d9626bea5b8?auto=format&fit=crop&w=900&q=80",
+  "Appletiser / Grapetiser": "https://images.unsplash.com/photo-1622597467836-f3285f2131b8?auto=format&fit=crop&w=900&q=80",
+  "Red Bull": "https://images.unsplash.com/photo-1560689189-65b6ed6228e7?auto=format&fit=crop&w=900&q=80",
+  "Still or Sparkling Water": "https://images.unsplash.com/photo-1564419320461-6870880221ad?auto=format&fit=crop&w=900&q=80",
+  // Milkshakes
+  "Chocolate Milkshake": "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=900&q=80",
+  "Strawberry Milkshake": "https://images.unsplash.com/photo-1577805947697-89e18249d767?auto=format&fit=crop&w=900&q=80",
+  "Vanilla Milkshake": "https://images.unsplash.com/photo-1568901839119-631418a3910d?auto=format&fit=crop&w=900&q=80",
+  "Bubblegum Milkshake": "https://images.unsplash.com/photo-1611928237590-087afc90c6fd?auto=format&fit=crop&w=900&q=80",
+  "Salted Caramel Milkshake": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&w=900&q=80",
+  "Nutella Specialty Milkshake": "https://images.unsplash.com/photo-1595981266586-1541a5a4307f?auto=format&fit=crop&w=900&q=80",
+  // Beers & Ciders
+  "Castle Lite": "https://images.unsplash.com/photo-1612528443702-f6741f70a049?auto=format&fit=crop&w=900&q=80",
+  "Castle Lager": "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=900&q=80",
+  "Black Label": "https://images.unsplash.com/photo-1518176258769-f227c798150e?auto=format&fit=crop&w=900&q=80",
+  "Stella Artois": "https://images.unsplash.com/photo-1567696911980-2eed69a46042?auto=format&fit=crop&w=900&q=80",
+  "Hunter’s Gold": "https://images.unsplash.com/photo-1628602041346-25218c541397?auto=format&fit=crop&w=900&q=80",
+  "Savanna Dry": "https://images.unsplash.com/photo-1600788886242-5c96aabe3757?auto=format&fit=crop&w=900&q=80",
+  // Cocktails
+  "Bloody Mary": "https://images.unsplash.com/photo-1594386180803-9087dffd4e5a?auto=format&fit=crop&w=900&q=80",
+  "Mojito": "https://images.unsplash.com/photo-1551538827-9c037cb4f32a?auto=format&fit=crop&w=900&q=80",
+  "Strawberry Daiquiri": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=900&q=80",
+  "Hennie’s Sunset": "https://images.unsplash.com/photo-1551751299-1b51cab2694c?auto=format&fit=crop&w=900&q=80",
+  "Frozen Inge / Shaken Inge": "https://images.unsplash.com/photo-1536935338788-846bb9981813?auto=format&fit=crop&w=900&q=80",
+  "Hennie’s Iced Tea": "https://images.unsplash.com/photo-1587223962930-cb7f31384c19?auto=format&fit=crop&w=900&q=80",
+  "Inge on the Beach": "https://images.unsplash.com/photo-1625321643320-5321f48312b2?auto=format&fit=crop&w=900&q=80",
+  "Ginger Ninja": "https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=900&q=80",
+  "Christa Colada": "https://images.unsplash.com/photo-1596392301391-e8622b210bd4?auto=format&fit=crop&w=900&q=80",
+  "Strawberry Margarita": "https://images.unsplash.com/photo-1556855810-ac404aa91e85?auto=format&fit=crop&w=900&q=80",
+  // Non-Alcoholic
+  "Virgin Hennie": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+  "Virgin Daiquiri": "https://images.unsplash.com/photo-1497534446932-c925b458314e?auto=format&fit=crop&w=900&q=80",
+  "Non-Alcoholic Lager": "https://images.unsplash.com/photo-1566633806327-68e152aaf26d?auto=format&fit=crop&w=900&q=80",
+  "Rock Shandy": "https://images.unsplash.com/photo-1621263764928-df1444c5e859?auto=format&fit=crop&w=900&q=80",
+};
 const raw: Array<[string, string, number, string, string[], string[]?]> = [
   [
     "Easy Shareables",
@@ -1002,7 +1090,7 @@ export const menuItems: MenuItem[] = raw.map(
       name,
       description,
       base_price,
-      image_url: imageFor(slug, tags, name),
+      image_url: imageFor(name),
       media_type: "image",
       tags,
       allergens: allergens || [],
@@ -1022,7 +1110,7 @@ export const specials: Special[] = [
     title: "Game Day Platter Special",
     description:
       "Bring the gees: selected platters and ice-cold drinks made for match day browsing.",
-    image_url: imageMap.share,
+    image_url: itemImages["Brakke Platter"],
     is_global: true,
     is_active: true,
     display_order: 1,
@@ -1032,7 +1120,7 @@ export const specials: Special[] = [
     title: "Burger & Shake Combo",
     description:
       "A branch favourite pairing a loaded burger with a creamy shake.",
-    image_url: imageMap.burger,
+    image_url: itemImages["Classic Hennies Burger"],
     is_global: false,
     is_active: true,
     display_order: 2,
@@ -1049,51 +1137,9 @@ export function slugify(value: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 }
-function imageFor(categorySlug: string, tags: string[], itemName: string) {
-  const name = slugify(itemName);
-  if (name.includes("chips") || name.includes("fries")) return imageMap.fries;
-  if (name.includes("nachos")) return imageMap.nachos;
-  if (name.includes("horrog") || name.includes("varkhond"))
-    return imageMap.hotdog;
-  if (name.includes("rib") || name.includes("ribbetjies")) return imageMap.ribs;
-  if (name.includes("calamari")) return imageMap.calamari;
-  if (name.includes("mushroom")) return imageMap.mushrooms;
-  if (name.includes("mozzarella") || name.includes("halloumi"))
-    return imageMap.mozzarella;
-  if (name.includes("omelette") || name.includes("egg"))
-    return imageMap.omelette;
-  if (name.includes("tea") || name.includes("rooibos")) return imageMap.tea;
-  if (
-    name.includes("soda") ||
-    name.includes("red-bull") ||
-    name.includes("appletiser")
-  )
-    return imageMap.soda;
-  if (name.includes("water")) return imageMap.water;
-  if (name.includes("milkshake") || categorySlug.includes("milkshakes"))
-    return imageMap.milkshake;
-  if (name.includes("dom-pedro")) return imageMap.dessertDrink;
-  if (name.includes("savanna") || name.includes("hunter"))
-    return imageMap.cider;
-  if (categorySlug.includes("pizza")) return imageMap.pizza;
-  if (categorySlug.includes("burger")) return imageMap.burger;
-  if (categorySlug.includes("wing")) return imageMap.wings;
-  if (categorySlug.includes("vleis")) return imageMap.steak;
-  if (categorySlug.includes("salad")) return imageMap.salad;
-  if (categorySlug.includes("sweet")) return imageMap.dessert;
-  if (categorySlug.includes("hot-drinks")) return imageMap.coffee;
-  if (categorySlug.includes("cold")) return imageMap.drink;
-  if (categorySlug.includes("beer")) return imageMap.beer;
-  if (
-    categorySlug.includes("cocktail") ||
-    categorySlug.includes("non-alcoholic")
-  )
-    return imageMap.cocktail;
-  if (categorySlug.includes("brekk")) return imageMap.breakfast;
-  if (tags.includes("shareable")) return imageMap.share;
-  return imageMap.starter;
+function imageFor(name: string) {
+  return itemImages[name] ?? FALLBACK_IMAGE;
 }
-
 export function getBranchBySlug(slug: string): Branch | undefined {
   return PUBLIC_BRANCHES.find((branch) => branch.slug === slug);
 }
