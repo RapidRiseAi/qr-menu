@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+  type Ref,
+} from "react";
 import {
   ArrowUp,
   ChevronDown,
@@ -351,7 +358,21 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
   const [selectedSpecial, setSelectedSpecial] = useState<Special | null>(null);
   const [isBooting, setIsBooting] = useState(true);
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(true);
+  const [houseRulesOpen, setHouseRulesOpen] = useState(false);
   const menuStartRef = useRef<HTMLDivElement>(null);
+  const houseRulesRef = useRef<HTMLElement>(null);
+
+  function openHouseRules() {
+    setQuery("");
+    setActiveCategory("all");
+    setHouseRulesOpen(true);
+    window.requestAnimationFrame(() =>
+      houseRulesRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      }),
+    );
+  }
   const normalized = query.trim().toLowerCase();
   const isCategoryView = activeCategory !== "all";
   const activeCategoryMeta = categories.find(
@@ -433,7 +454,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
   }
 
   return (
-    <main className="min-h-screen overflow-hidden bg-hennies-night text-white">
+    <main className="min-h-screen overflow-x-clip bg-hennies-night text-white">
       <section className="sticky top-0 z-40 border-b border-white/10 bg-hennies-night/95 shadow-[0_12px_35px_rgba(0,0,0,.28)] backdrop-blur-xl">
         <div className="mx-auto max-w-6xl px-4 py-3">
           <div className="flex items-center justify-between gap-3">
@@ -462,7 +483,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
             />
           </div>
         </div>
-        <nav className="no-scrollbar flex gap-2 overflow-x-auto px-4 pb-3 md:justify-center">
+        <nav className="no-scrollbar flex gap-2 overflow-x-auto px-4 pb-3">
           <CategoryTab
             label="All"
             active={activeCategory === "all"}
@@ -481,9 +502,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
 
       <section
         ref={menuStartRef}
-        className={`relative mx-auto max-w-7xl scroll-mt-36 px-4 pb-10 pt-4 transition-[padding] duration-300 ${
-          isQuickMenuOpen ? "xl:pl-[15.5rem]" : ""
-        }`}
+        className="relative mx-auto max-w-7xl scroll-mt-36 px-4 pb-10 pt-4"
       >
         <div
           aria-hidden
@@ -491,7 +510,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
         />
 
         {isQuickMenuOpen ? (
-          <aside className="fixed left-6 top-44 z-20 hidden max-h-[calc(100vh-12rem)] w-52 flex-col rounded-[1.5rem] border border-white/10 bg-hennies-night/90 p-3 shadow-2xl backdrop-blur-xl xl:flex">
+          <aside className="fixed left-[max(1.25rem,calc(50%_-_54rem))] top-[12.5rem] z-20 hidden max-h-[calc(100vh_-_14rem)] w-52 flex-col rounded-[1.5rem] border border-white/10 bg-hennies-night/90 p-3 shadow-2xl backdrop-blur-xl xl:flex">
             <div className="mb-2 flex shrink-0 items-center justify-between gap-2 px-2">
               <p className="text-[10px] font-black uppercase tracking-[0.24em] text-hennies-sky">
                 Quick menu
@@ -517,6 +536,13 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
               >
                 Full menu
               </button>
+              <button
+                type="button"
+                onClick={openHouseRules}
+                className="mb-0.5 w-full rounded-xl px-3 py-1.5 text-left text-xs font-black text-white/70 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky"
+              >
+                House Rules
+              </button>
               {categories.map((category) => (
                 <button
                   type="button"
@@ -534,7 +560,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
           <button
             type="button"
             onClick={() => setIsQuickMenuOpen(true)}
-            className="fixed left-6 top-44 z-20 hidden items-center gap-2 rounded-full border border-white/10 bg-hennies-night/90 px-4 py-3 text-xs font-black uppercase tracking-[0.18em] text-hennies-sky shadow-2xl backdrop-blur-xl transition hover:bg-hennies-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky xl:flex"
+            className="fixed left-[max(1.25rem,calc(50%_-_54rem))] top-[12.5rem] z-20 hidden items-center gap-2 rounded-full border border-white/10 bg-hennies-night/90 px-4 py-3 text-xs font-black uppercase tracking-[0.18em] text-hennies-sky shadow-2xl backdrop-blur-xl transition hover:bg-hennies-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky xl:flex"
             aria-label="Open quick menu"
           >
             <Menu className="h-4 w-4" /> Quick menu
@@ -566,7 +592,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
                 title="Popular picks"
                 subtitle="Fan favourites for quick browsing."
               >
-                <div className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2">
+                <div className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 py-5">
                   {popular.map((item) => (
                     <ItemCard
                       key={item.id}
@@ -672,12 +698,12 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
       >
         <ArrowUp className="h-5 w-5" />
       </button>
-      <HouseRules shifted={isQuickMenuOpen} />
-      <footer
-        className={`border-t border-white/10 px-4 py-6 text-center text-xs font-black uppercase tracking-[0.2em] text-white/55 transition-[padding] duration-300 ${
-          isQuickMenuOpen ? "xl:pl-[15.5rem]" : ""
-        }`}
-      >
+      <HouseRules
+        open={houseRulesOpen}
+        onToggle={() => setHouseRulesOpen((value) => !value)}
+        sectionRef={houseRulesRef}
+      />
+      <footer className="border-t border-white/10 px-4 py-6 text-center text-xs font-black uppercase tracking-[0.2em] text-white/55">
         {POWERED_BY}
       </footer>
       {selected && (
@@ -1153,18 +1179,25 @@ const HOUSE_RULES: ReactNode[] = [
   </>,
 ];
 
-function HouseRules({ shifted }: { shifted: boolean }) {
-  const [open, setOpen] = useState(false);
+function HouseRules({
+  open,
+  onToggle,
+  sectionRef,
+}: {
+  open: boolean;
+  onToggle: () => void;
+  sectionRef: Ref<HTMLElement>;
+}) {
   return (
     <section
-      className={`mx-auto mt-8 max-w-7xl px-4 transition-[padding] duration-300 ${
-        shifted ? "xl:pl-[15.5rem]" : ""
-      }`}
+      ref={sectionRef}
+      id="house-rules"
+      className="mx-auto mt-8 max-w-7xl scroll-mt-28 px-4"
     >
       <div className="overflow-hidden rounded-[1.5rem] border border-hennies-sky/30 bg-[linear-gradient(160deg,#0a4072,#002f5f_55%,#06243f)] shadow-[0_18px_50px_rgba(0,0,0,.35)]">
         <button
           type="button"
-          onClick={() => setOpen((value) => !value)}
+          onClick={onToggle}
           aria-expanded={open}
           aria-controls="house-rules-panel"
           className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-hennies-sky"
