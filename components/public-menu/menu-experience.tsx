@@ -359,6 +359,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
   const [isBooting, setIsBooting] = useState(true);
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(true);
   const [houseRulesOpen, setHouseRulesOpen] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const menuStartRef = useRef<HTMLDivElement>(null);
   const houseRulesRef = useRef<HTMLElement>(null);
 
@@ -373,6 +374,19 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
       }),
     );
   }
+
+  useEffect(() => {
+    if (!isNavOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsNavOpen(false);
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [isNavOpen]);
   const normalized = query.trim().toLowerCase();
   const isCategoryView = activeCategory !== "all";
   const activeCategoryMeta = categories.find(
@@ -471,6 +485,15 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
                 </h1>
               </div>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsNavOpen(true)}
+              aria-label="Open menu"
+              aria-haspopup="dialog"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/10 text-hennies-sky transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky xl:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
           </div>
           <div className="mt-3 flex items-center gap-2 rounded-[1.25rem] border border-white/10 bg-white/10 px-3 py-3 shadow-inner">
             <Search className="h-5 w-5 text-hennies-sky" />
@@ -683,6 +706,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
                         categoryLookup.get(item.category_slug) || category.name
                       }
                       onClick={() => setSelected(item)}
+                      showCategory={false}
                     />
                   ))}
                 </div>
@@ -714,6 +738,87 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
           special={selectedSpecial}
           onClose={() => setSelectedSpecial(null)}
         />
+      )}
+      {isNavOpen && (
+        <div
+          className="fixed inset-0 z-50 xl:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu navigation"
+        >
+          <div
+            className="hennies-fade-in absolute inset-0 bg-black/65 backdrop-blur-sm"
+            onClick={() => setIsNavOpen(false)}
+          />
+          <div className="hennies-slide-in-left absolute inset-y-0 left-0 flex w-[84%] max-w-xs flex-col border-r border-white/10 bg-hennies-night shadow-2xl">
+            <div className="flex items-center justify-between gap-3 border-b border-white/10 px-5 py-4">
+              <div className="flex items-center gap-3">
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-hennies-sky bg-hennies-cream text-[10px] font-black uppercase text-hennies-navy">
+                  HDM
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black uppercase tracking-[0.24em] text-hennies-sky">
+                    Menu
+                  </p>
+                  <p className="truncate text-sm font-black text-white">
+                    {branch.name}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsNavOpen(false)}
+                aria-label="Close menu"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/10 text-white/80 transition hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <nav
+              aria-label="Menu sections and categories"
+              className="no-scrollbar flex-1 overflow-y-auto p-3"
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  selectCategory("all");
+                  setIsNavOpen(false);
+                }}
+                aria-current={activeCategory === "all"}
+                className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky ${activeCategory === "all" ? "bg-hennies-orange text-white shadow-orange" : "text-white/80 hover:bg-white/10"}`}
+              >
+                <Menu className="h-4 w-4 shrink-0" /> Full menu
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  openHouseRules();
+                  setIsNavOpen(false);
+                }}
+                className="mt-1 flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-black text-white/80 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky"
+              >
+                <ScrollText className="h-4 w-4 shrink-0" /> House Rules
+              </button>
+              <p className="px-4 pb-1 pt-4 text-[10px] font-black uppercase tracking-[0.24em] text-hennies-sky/80">
+                Categories
+              </p>
+              {categories.map((category) => (
+                <button
+                  type="button"
+                  key={category.slug}
+                  onClick={() => {
+                    selectCategory(category.slug);
+                    setIsNavOpen(false);
+                  }}
+                  aria-current={activeCategory === category.slug}
+                  className={`mt-0.5 flex w-full items-center justify-between gap-2 rounded-2xl px-4 py-2.5 text-left text-sm font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky ${activeCategory === category.slug ? "bg-hennies-orange text-white shadow-orange" : "text-white/75 hover:bg-white/10"}`}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
       )}
     </main>
   );
@@ -785,10 +890,7 @@ function Section({
   return (
     <section className={tight ? "mt-3" : "mt-10"}>
       <div className="mb-5 border-l-4 border-hennies-orange pl-4">
-        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-hennies-sky">
-          Hennie’s menu
-        </p>
-        <h2 className="mt-1 text-3xl font-black leading-none text-hennies-cream sm:text-4xl">
+        <h2 className="text-3xl font-black leading-none text-hennies-cream sm:text-4xl">
           {title}
         </h2>
         <p className="mt-2 max-w-2xl text-sm font-semibold text-white/62">
@@ -844,11 +946,13 @@ function ItemCard({
   onClick,
   compact = false,
   categoryName,
+  showCategory = true,
 }: {
   item: MenuItem;
   onClick: () => void;
   compact?: boolean;
   categoryName: string;
+  showCategory?: boolean;
 }) {
   return (
     <article
@@ -886,9 +990,11 @@ function ItemCard({
         </div>
       </div>
       <div className="flex min-h-full flex-col border-l border-hennies-orange/10 p-3.5 sm:border-l-0 sm:border-t sm:p-4">
-        <div className="mb-2 inline-flex w-fit rounded-full bg-hennies-navy/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-hennies-navy">
-          {categoryName}
-        </div>
+        {showCategory && (
+          <div className="mb-2 inline-flex w-fit rounded-full bg-hennies-navy/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-hennies-navy">
+            {categoryName}
+          </div>
+        )}
         <div className="flex items-start justify-between gap-2">
           <h3 className="min-w-0 text-lg font-black leading-[1.05] tracking-[-0.02em] sm:text-xl">
             {item.name}
@@ -900,7 +1006,7 @@ function ItemCard({
         <p className="mt-2 line-clamp-3 text-sm font-semibold leading-relaxed text-slate-700 sm:line-clamp-2">
           {item.description}
         </p>
-        <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-3">
+        <div className="mt-auto hidden flex-wrap items-center gap-1.5 pt-3 sm:flex">
           {item.tags.slice(0, compact ? 2 : 3).map((tag) => (
             <span
               key={tag}
