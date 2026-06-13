@@ -1,7 +1,23 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { ArrowUp, Flame, Info, Menu, Search, X } from "lucide-react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+  type Ref,
+} from "react";
+import {
+  ArrowUp,
+  ChevronDown,
+  Flame,
+  Info,
+  Menu,
+  ScrollText,
+  Search,
+  X,
+} from "lucide-react";
 import { BRAND_PLACEHOLDER, POWERED_BY } from "@/lib/constants";
 import type {
   Branch,
@@ -342,7 +358,35 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
   const [selectedSpecial, setSelectedSpecial] = useState<Special | null>(null);
   const [isBooting, setIsBooting] = useState(true);
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(true);
+  const [houseRulesOpen, setHouseRulesOpen] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const menuStartRef = useRef<HTMLDivElement>(null);
+  const houseRulesRef = useRef<HTMLElement>(null);
+
+  function openHouseRules() {
+    setQuery("");
+    setActiveCategory("all");
+    setHouseRulesOpen(true);
+    window.requestAnimationFrame(() =>
+      houseRulesRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      }),
+    );
+  }
+
+  useEffect(() => {
+    if (!isNavOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsNavOpen(false);
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [isNavOpen]);
   const normalized = query.trim().toLowerCase();
   const isCategoryView = activeCategory !== "all";
   const activeCategoryMeta = categories.find(
@@ -424,7 +468,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
   }
 
   return (
-    <main className="min-h-screen overflow-hidden bg-hennies-night text-white">
+    <main className="min-h-screen overflow-x-clip bg-hennies-night text-white">
       <section className="sticky top-0 z-40 border-b border-white/10 bg-hennies-night/95 shadow-[0_12px_35px_rgba(0,0,0,.28)] backdrop-blur-xl">
         <div className="mx-auto max-w-6xl px-4 py-3">
           <div className="flex items-center justify-between gap-3">
@@ -441,6 +485,15 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
                 </h1>
               </div>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsNavOpen(true)}
+              aria-label="Open menu"
+              aria-haspopup="dialog"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/10 text-hennies-sky transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky xl:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
           </div>
           <div className="mt-3 flex items-center gap-2 rounded-[1.25rem] border border-white/10 bg-white/10 px-3 py-3 shadow-inner">
             <Search className="h-5 w-5 text-hennies-sky" />
@@ -448,11 +501,12 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search burgers, chips, braaibroodjie, cocktails…"
-              className="w-full bg-transparent text-[16px] font-semibold text-white outline-none placeholder:text-white/48"
+              aria-label="Search the menu"
+              className="w-full bg-transparent text-[16px] font-semibold text-white outline-none placeholder:text-white/60"
             />
           </div>
         </div>
-        <nav className="no-scrollbar flex gap-2 overflow-x-auto px-4 pb-3 md:justify-center">
+        <nav className="no-scrollbar flex gap-2 overflow-x-auto px-4 pb-3">
           <CategoryTab
             label="All"
             active={activeCategory === "all"}
@@ -473,48 +527,63 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
         ref={menuStartRef}
         className="relative mx-auto max-w-7xl scroll-mt-36 px-4 pb-10 pt-4"
       >
-        <div className="absolute inset-x-0 top-0 -z-0 h-72 bg-[radial-gradient(circle_at_top_left,rgba(82,198,226,.18),transparent_38%),radial-gradient(circle_at_top_right,rgba(240,171,0,.16),transparent_40%)]" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 -top-6 -z-10 h-64 bg-[radial-gradient(46%_70%_at_34%_0%,rgba(82,198,226,.13),transparent_72%),radial-gradient(46%_70%_at_66%_0%,rgba(240,171,0,.11),transparent_72%)]"
+        />
 
         {isQuickMenuOpen ? (
-          <aside className="fixed left-6 top-52 z-20 hidden w-52 rounded-[1.5rem] border border-white/10 bg-hennies-night/90 p-3 shadow-2xl backdrop-blur-xl xl:block">
-            <div className="mb-2 flex items-center justify-between gap-2 px-2">
+          <aside className="fixed left-[max(1.25rem,calc(50%_-_54rem))] top-[12.5rem] z-20 hidden max-h-[calc(100vh_-_14rem)] w-52 flex-col rounded-[1.5rem] border border-white/10 bg-hennies-night/90 p-3 shadow-2xl backdrop-blur-xl xl:flex">
+            <div className="mb-2 flex shrink-0 items-center justify-between gap-2 px-2">
               <p className="text-[10px] font-black uppercase tracking-[0.24em] text-hennies-sky">
                 Quick menu
               </p>
               <button
                 type="button"
                 onClick={() => setIsQuickMenuOpen(false)}
-                className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white/75 transition hover:bg-white/15 hover:text-white"
+                className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white/75 transition hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky"
                 aria-label="Close quick menu"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="max-h-[calc(100vh-15rem)] overflow-auto pr-1">
+            <nav
+              aria-label="Quick category navigation"
+              className="no-scrollbar min-h-0 flex-1 overflow-y-auto pr-1"
+            >
               <button
                 type="button"
                 onClick={() => selectCategory("all")}
-                className={`mb-1 w-full rounded-2xl px-3 py-2 text-left text-xs font-black ${activeCategory === "all" ? "bg-hennies-orange text-white shadow-orange" : "text-white/70 hover:bg-white/10"}`}
+                aria-current={activeCategory === "all"}
+                className={`mb-0.5 w-full rounded-xl px-3 py-1.5 text-left text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky ${activeCategory === "all" ? "bg-hennies-orange text-white shadow-orange" : "text-white/70 hover:bg-white/10"}`}
               >
                 Full menu
+              </button>
+              <button
+                type="button"
+                onClick={openHouseRules}
+                className="mb-0.5 w-full rounded-xl px-3 py-1.5 text-left text-xs font-black text-white/70 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky"
+              >
+                House Rules
               </button>
               {categories.map((category) => (
                 <button
                   type="button"
                   key={category.slug}
                   onClick={() => selectCategory(category.slug)}
-                  className={`mb-1 w-full rounded-2xl px-3 py-2 text-left text-xs font-black ${activeCategory === category.slug ? "bg-hennies-orange text-white shadow-orange" : "text-white/70 hover:bg-white/10"}`}
+                  aria-current={activeCategory === category.slug}
+                  className={`mb-0.5 w-full rounded-xl px-3 py-1.5 text-left text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky ${activeCategory === category.slug ? "bg-hennies-orange text-white shadow-orange" : "text-white/70 hover:bg-white/10"}`}
                 >
                   {category.name}
                 </button>
               ))}
-            </div>
+            </nav>
           </aside>
         ) : (
           <button
             type="button"
             onClick={() => setIsQuickMenuOpen(true)}
-            className="fixed left-6 top-52 z-20 hidden items-center gap-2 rounded-full border border-white/10 bg-hennies-night/90 px-4 py-3 text-xs font-black uppercase tracking-[0.18em] text-hennies-sky shadow-2xl backdrop-blur-xl transition hover:bg-hennies-blue xl:flex"
+            className="fixed left-[max(1.25rem,calc(50%_-_54rem))] top-[12.5rem] z-20 hidden items-center gap-2 rounded-full border border-white/10 bg-hennies-night/90 px-4 py-3 text-xs font-black uppercase tracking-[0.18em] text-hennies-sky shadow-2xl backdrop-blur-xl transition hover:bg-hennies-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky xl:flex"
             aria-label="Open quick menu"
           >
             <Menu className="h-4 w-4" /> Quick menu
@@ -546,7 +615,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
                 title="Popular picks"
                 subtitle="Fan favourites for quick browsing."
               >
-                <div className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2">
+                <div className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 py-5">
                   {popular.map((item) => (
                     <ItemCard
                       key={item.id}
@@ -637,6 +706,7 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
                         categoryLookup.get(item.category_slug) || category.name
                       }
                       onClick={() => setSelected(item)}
+                      showCategory={false}
                     />
                   ))}
                 </div>
@@ -652,6 +722,11 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
       >
         <ArrowUp className="h-5 w-5" />
       </button>
+      <HouseRules
+        open={houseRulesOpen}
+        onToggle={() => setHouseRulesOpen((value) => !value)}
+        sectionRef={houseRulesRef}
+      />
       <footer className="border-t border-white/10 px-4 py-6 text-center text-xs font-black uppercase tracking-[0.2em] text-white/55">
         {POWERED_BY}
       </footer>
@@ -663,6 +738,87 @@ export function MenuExperience({ branch, categories, items, specials }: Props) {
           special={selectedSpecial}
           onClose={() => setSelectedSpecial(null)}
         />
+      )}
+      {isNavOpen && (
+        <div
+          className="fixed inset-0 z-50 xl:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu navigation"
+        >
+          <div
+            className="hennies-fade-in absolute inset-0 bg-black/65 backdrop-blur-sm"
+            onClick={() => setIsNavOpen(false)}
+          />
+          <div className="hennies-slide-in-left absolute inset-y-0 left-0 flex w-[84%] max-w-xs flex-col border-r border-white/10 bg-hennies-night shadow-2xl">
+            <div className="flex items-center justify-between gap-3 border-b border-white/10 px-5 py-4">
+              <div className="flex items-center gap-3">
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-hennies-sky bg-hennies-cream text-[10px] font-black uppercase text-hennies-navy">
+                  HDM
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black uppercase tracking-[0.24em] text-hennies-sky">
+                    Menu
+                  </p>
+                  <p className="truncate text-sm font-black text-white">
+                    {branch.name}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsNavOpen(false)}
+                aria-label="Close menu"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/10 text-white/80 transition hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <nav
+              aria-label="Menu sections and categories"
+              className="no-scrollbar flex-1 overflow-y-auto p-3"
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  selectCategory("all");
+                  setIsNavOpen(false);
+                }}
+                aria-current={activeCategory === "all"}
+                className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky ${activeCategory === "all" ? "bg-hennies-orange text-white shadow-orange" : "text-white/80 hover:bg-white/10"}`}
+              >
+                <Menu className="h-4 w-4 shrink-0" /> Full menu
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  openHouseRules();
+                  setIsNavOpen(false);
+                }}
+                className="mt-1 flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-black text-white/80 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky"
+              >
+                <ScrollText className="h-4 w-4 shrink-0" /> House Rules
+              </button>
+              <p className="px-4 pb-1 pt-4 text-[10px] font-black uppercase tracking-[0.24em] text-hennies-sky/80">
+                Categories
+              </p>
+              {categories.map((category) => (
+                <button
+                  type="button"
+                  key={category.slug}
+                  onClick={() => {
+                    selectCategory(category.slug);
+                    setIsNavOpen(false);
+                  }}
+                  aria-current={activeCategory === category.slug}
+                  className={`mt-0.5 flex w-full items-center justify-between gap-2 rounded-2xl px-4 py-2.5 text-left text-sm font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky ${activeCategory === category.slug ? "bg-hennies-orange text-white shadow-orange" : "text-white/75 hover:bg-white/10"}`}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
       )}
     </main>
   );
@@ -708,7 +864,8 @@ function CategoryTab({
   return (
     <button
       onClick={onClick}
-      className={`whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-black transition ${
+      aria-current={active}
+      className={`whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-sky ${
         active
           ? "bg-hennies-orange text-white shadow-orange"
           : "bg-white/10 text-white/78 hover:bg-white/15"
@@ -733,10 +890,7 @@ function Section({
   return (
     <section className={tight ? "mt-3" : "mt-10"}>
       <div className="mb-5 border-l-4 border-hennies-orange pl-4">
-        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-hennies-sky">
-          Hennie’s menu
-        </p>
-        <h2 className="mt-1 text-3xl font-black leading-none text-hennies-cream sm:text-4xl">
+        <h2 className="text-3xl font-black leading-none text-hennies-cream sm:text-4xl">
           {title}
         </h2>
         <p className="mt-2 max-w-2xl text-sm font-semibold text-white/62">
@@ -792,11 +946,13 @@ function ItemCard({
   onClick,
   compact = false,
   categoryName,
+  showCategory = true,
 }: {
   item: MenuItem;
   onClick: () => void;
   compact?: boolean;
   categoryName: string;
+  showCategory?: boolean;
 }) {
   return (
     <article
@@ -806,7 +962,7 @@ function ItemCard({
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") onClick();
       }}
-      className={`group grid cursor-pointer overflow-hidden rounded-[1.35rem] border border-hennies-sky/20 bg-[linear-gradient(180deg,#f2e9df,#fff7ed)] text-left text-hennies-navy shadow-[0_16px_36px_rgba(0,0,0,.32)] ring-1 ring-white/10 transition hover:-translate-y-1 hover:border-hennies-orange/55 hover:shadow-orange ${
+      className={`group grid cursor-pointer overflow-hidden rounded-[1.35rem] border border-hennies-sky/20 bg-[linear-gradient(180deg,#f2e9df,#fff7ed)] text-left text-hennies-navy shadow-[0_16px_36px_rgba(0,0,0,.32)] ring-1 ring-white/10 transition hover:-translate-y-1 hover:border-hennies-orange/55 hover:shadow-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hennies-orange focus-visible:ring-offset-2 focus-visible:ring-offset-hennies-night ${
         compact
           ? "min-w-[78vw] snap-start sm:min-w-[320px]"
           : "grid-cols-[132px_1fr] sm:grid-cols-1"
@@ -825,14 +981,20 @@ function ItemCard({
         />
         <div className="absolute left-2 top-2 flex flex-wrap gap-1.5">
           {item.is_popular && <Badge text="Popular" />}
+          {item.tags.includes("vegetarian") && <Badge text="Veg" tone="green" />}
+          {(item.tags.includes("spicy") || Boolean(item.spice_level)) && (
+            <Badge text="Spicy" tone="red" />
+          )}
           {item.is_new && <Badge text="New" />}
           {item.is_sold_out && <Badge text="Sold out" tone="dark" />}
         </div>
       </div>
       <div className="flex min-h-full flex-col border-l border-hennies-orange/10 p-3.5 sm:border-l-0 sm:border-t sm:p-4">
-        <div className="mb-2 inline-flex w-fit rounded-full bg-hennies-navy/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-hennies-navy">
-          {categoryName}
-        </div>
+        {showCategory && (
+          <div className="mb-2 inline-flex w-fit rounded-full bg-hennies-navy/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-hennies-navy">
+            {categoryName}
+          </div>
+        )}
         <div className="flex items-start justify-between gap-2">
           <h3 className="min-w-0 text-lg font-black leading-[1.05] tracking-[-0.02em] sm:text-xl">
             {item.name}
@@ -844,7 +1006,7 @@ function ItemCard({
         <p className="mt-2 line-clamp-3 text-sm font-semibold leading-relaxed text-slate-700 sm:line-clamp-2">
           {item.description}
         </p>
-        <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-3">
+        <div className="mt-auto hidden flex-wrap items-center gap-1.5 pt-3 sm:flex">
           {item.tags.slice(0, compact ? 2 : 3).map((tag) => (
             <span
               key={tag}
@@ -933,11 +1095,17 @@ function Badge({
   tone = "orange",
 }: {
   text: string;
-  tone?: "orange" | "dark";
+  tone?: "orange" | "dark" | "green" | "red";
 }) {
+  const toneClass = {
+    orange: "bg-hennies-orange text-white",
+    dark: "bg-slate-950 text-white",
+    green: "bg-hennies-green text-slate-950",
+    red: "bg-red-600 text-white",
+  }[tone];
   return (
     <span
-      className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${tone === "orange" ? "bg-hennies-orange text-white" : "bg-slate-950 text-white"}`}
+      className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide shadow-sm ${toneClass}`}
     >
       {text}
     </span>
@@ -1079,6 +1247,113 @@ function SpecialModal({
         </div>
       </article>
     </div>
+  );
+}
+
+const HOUSE_RULES: ReactNode[] = [
+  <>Don’t be a d**s.</>,
+  <>
+    <strong>Always</strong> have fun.
+  </>,
+  <>
+    Don’t let Rule <strong>#2</strong> make you break Rule <strong>#1</strong>.
+  </>,
+  <>
+    Always drink with your left hand{" "}
+    <strong>(Buffalo rules apply).</strong> If you are caught drinking with your
+    right hand, you will be asked to down your drink.
+  </>,
+  <>
+    <strong>Whistle</strong> if you need service.
+  </>,
+  <>Always respect the bark by barking along.</>,
+  <>
+    <strong>Don’t ring the bell!</strong> If you ring the bell, you have to buy
+    the whole Hennie’s a round! If you do not, you will be asked to leave.
+  </>,
+  <>
+    <strong>Always stand up &amp; respect</strong> the National Anthem of South
+    Africa.
+  </>,
+  <>
+    <strong>Please tip your waiter</strong> or barman (refer to Rule{" "}
+    <strong>#1</strong>).
+  </>,
+  <>
+    You may forget some of the rules, except Rule <strong>#1</strong> and Rule{" "}
+    <strong>#7</strong>… <strong>don’t ring the bell!</strong>
+  </>,
+];
+
+function HouseRules({
+  open,
+  onToggle,
+  sectionRef,
+}: {
+  open: boolean;
+  onToggle: () => void;
+  sectionRef: Ref<HTMLElement>;
+}) {
+  return (
+    <section
+      ref={sectionRef}
+      id="house-rules"
+      className="mx-auto mt-8 max-w-7xl scroll-mt-28 px-4"
+    >
+      <div className="overflow-hidden rounded-[1.5rem] border border-hennies-sky/30 bg-[linear-gradient(160deg,#0a4072,#002f5f_55%,#06243f)] shadow-[0_18px_50px_rgba(0,0,0,.35)]">
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          aria-controls="house-rules-panel"
+          className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-hennies-sky"
+        >
+          <span className="flex items-center gap-3">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-hennies-orange text-white shadow-orange">
+              <ScrollText className="h-5 w-5" />
+            </span>
+            <span className="block">
+              <span className="block text-[10px] font-black uppercase tracking-[0.28em] text-hennies-sky">
+                House Rules
+              </span>
+              <span className="block text-2xl font-black leading-none text-hennies-cream sm:text-3xl">
+                The Hennie’s Rules
+              </span>
+            </span>
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="hidden rounded-full bg-hennies-orange px-3 py-1.5 text-xs font-black uppercase text-white shadow-orange sm:inline-flex">
+              Rule #1
+            </span>
+            <ChevronDown
+              className={`h-6 w-6 text-hennies-sky transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+            />
+          </span>
+        </button>
+        {open && (
+          <div
+            id="house-rules-panel"
+            className="border-t border-white/10 px-5 pb-5 pt-4"
+          >
+            <ol className="grid gap-2.5">
+              {HOUSE_RULES.map((rule, index) => (
+                <li key={index} className="flex gap-3">
+                  <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-hennies-orange/90 text-[12px] font-black text-white">
+                    {index + 1}
+                  </span>
+                  <p className="text-sm font-semibold leading-relaxed text-white/85 [&_strong]:font-black [&_strong]:text-hennies-gold">
+                    {rule}
+                  </p>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-5 border-t border-white/10 pt-4 text-center text-[11px] font-black uppercase tracking-[0.18em] text-white/55">
+              © Copyright. All rights reserved. Rikus de Beer 2018
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 

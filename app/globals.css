@@ -39,6 +39,40 @@ select {
     background-position-x: -200%;
   }
 }
+@keyframes hennies-slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes hennies-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.hennies-slide-in-left {
+  animation: hennies-slide-in-left 0.28s ease-out;
+}
+.hennies-fade-in {
+  animation: hennies-fade-in 0.2s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
 .print-only {
   display: none;
 }
